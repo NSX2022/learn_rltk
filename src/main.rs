@@ -30,8 +30,7 @@ use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem };
 use crate::saveload_system::clear_ecs;
 
 pub mod saveload_system;
-
-
+mod random_table;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { AwaitingInput,
@@ -111,18 +110,20 @@ impl State {
             self.ecs.delete_entity(target).expect("Unable to delete entity");
         }
 
+
         // Build a new map and place the player
         let worldmap;
+        let current_depth;
         {
             let mut worldmap_resource = self.ecs.write_resource::<Map>();
-            let current_depth = worldmap_resource.depth;
+            current_depth = worldmap_resource.depth;
             *worldmap_resource = Map::new_map_rooms_and_corridors(current_depth + 1);
             worldmap = worldmap_resource.clone();
         }
 
-        // Spawn bad guys
+        // Spawn chuds
         for room in worldmap.rooms.iter().skip(1) {
-            spawner::spawn_room(&mut self.ecs, room);
+            spawner::spawn_room(&mut self.ecs, room, current_depth+1);
         }
 
         // Place the player and update resources
@@ -310,8 +311,6 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Player>();
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Monster>();
-    eprintln!("a new change");
-    eprintln!("another new change");
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<CombatStats>();
@@ -340,7 +339,7 @@ fn main() -> rltk::BError {
 
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     for room in map.rooms.iter().skip(1) {
-        spawner::spawn_room(&mut gs.ecs, room);
+        spawner::spawn_room(&mut gs.ecs, room, 1);
     }
 
     gs.ecs.insert(map);
@@ -360,7 +359,7 @@ fn true_new_game(gs: &mut World) {
 
     gs.insert(rltk::RandomNumberGenerator::new());
     for room in map.rooms.iter().skip(1) {
-        spawner::spawn_room(gs, room);
+        spawner::spawn_room(gs, room, 1);
     }
 
     gs.insert(map);
