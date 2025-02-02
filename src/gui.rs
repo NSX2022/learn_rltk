@@ -97,6 +97,7 @@ pub fn show_inventory(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult, Opti
     let count = inventory.count();
 
     //WARNING: too many inventory items leads to overflow
+    //TODO add pages to inventory menu
     let mut y = (25 - (count / 2)) as i32;
     ctx.draw_box(15, y-2, 31, (count+3) as i32, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
     ctx.print_color(18, y-2, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Inventory");

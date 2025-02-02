@@ -187,10 +187,10 @@ fn confusion_scroll(ecs: &mut World, x: i32, y: i32) {
 fn room_table(map_depth: i32) -> RandomTable {
     RandomTable::new()
         .add("Goblin", 11)
-        .add("Orc", 1 + map_depth)
-        .add("Health Potion", 7)
-        .add("Fireball Scroll", 2 + map_depth)
-        .add("Confusion Scroll", 2 + map_depth)
-        .add("Magic Missile Scroll", 4)
-        .add("Dart", 9)
+        .add("Orc", 0 + map_depth)
+        .add("Health Potion", 4)
+        .add("Fireball Scroll", 1 + map_depth)
+        .add("Confusion Scroll", 1 + map_depth)
+        .add("Magic Missile Scroll", 2)
+        .add("Dart", 4)
 }
