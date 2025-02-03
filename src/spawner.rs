@@ -3,7 +3,7 @@ use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood};
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper};
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -74,6 +74,8 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
             "Longsword" => longsword(ecs, x, y),
             "Tower Shield" => tower_shield(ecs, x, y),
             "Rations" => rations(ecs, x, y),
+            "Ambrosia" => ambrosia(ecs, x, y),
+            "Scroll of Mapping" => magic_mapping_scroll(ecs, x, y),
             _ => {}
         }
     }
@@ -263,7 +265,7 @@ fn rations(ecs: &mut World, x: i32, y: i32) {
         .with(Position{ x, y })
         .with(Renderable{
             glyph: rltk::to_cp437('%'),
-            fg: RGB::named(rltk::GREEN),
+            fg: RGB::named(rltk::ORANGE2),
             bg: RGB::named(rltk::BLACK),
             render_order: 2
         })
@@ -275,18 +277,55 @@ fn rations(ecs: &mut World, x: i32, y: i32) {
         .build();
 }
 
+fn ambrosia(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('+'),
+            fg: RGB::named(rltk::YELLOWGREEN),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Ambrosia".to_string() })
+        .with(Item{})
+        .with(ProvidesFood{})
+        .with(ProvidesHealing{ heal_amount: 6})
+        .with(Consumable{})
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn magic_mapping_scroll(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437(')'),
+            fg: RGB::named(rltk::DARKOLIVEGREEN3),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Scroll of Mapping".to_string() })
+        .with(Item{})
+        .with(MagicMapper{})
+        .with(Consumable{})
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
 fn room_table(map_depth: i32) -> RandomTable {
     RandomTable::new()
         .add("Goblin", 15)
         .add("Orc", 0 + map_depth)
         .add("Health Potion", 4)
-        .add("Fireball Scroll", 0 + map_depth)
-        .add("Confusion Scroll", 1 + map_depth)
+        .add("Fireball Scroll", i32::min(map_depth, 10))
+        .add("Confusion Scroll", i32::min(1 + map_depth, 12))
         .add("Magic Missile Scroll", 2)
         .add("Dart", 4)
         .add("Dagger", 2)
         .add("Shield", 2)
-        .add("Longsword", map_depth - 2)
-        .add("Tower Shield", map_depth - 2)
+        .add("Longsword", i32::min(map_depth, 6) - 2)
+        .add("Tower Shield", i32::min(map_depth, 6) - 2)
         .add("Rations", 10)
+        .add("Ambrosia", i32::min(map_depth, 25) - 15)
+        .add("Scroll of Mapping", 400)
 }
