@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{CombatStats, SufferDamage, Player, Name};
+use super::{CombatStats, SufferDamage, Player, Name, RunState};
 use rltk::console;
 use crate::gamelog::GameLog;
 
@@ -32,6 +32,7 @@ pub fn delete_the_dead(ecs : &mut World) {
         for (entity, stats) in (&entities, &combat_stats).join() {
             if stats.hp < 1 {
                 let player = players.get(entity);
+
                 match player {
                     None => {
                         let victim_name = names.get(entity);
@@ -40,7 +41,10 @@ pub fn delete_the_dead(ecs : &mut World) {
                         }
                         dead.push(entity)
                     }
-                    Some(_) => log.entries.push(format!("You are dead and can no longer act upon the mortal realm"))
+                    Some(_) => {
+                        let mut runstate = ecs.write_resource::<RunState>();
+                        *runstate = RunState::GameOver;
+                    }
                 }
             }
         }

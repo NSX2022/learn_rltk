@@ -3,7 +3,7 @@ use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe};
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus};
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -68,6 +68,10 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
             "Confusion Scroll" => confusion_scroll(ecs, x, y),
             "Magic Missile Scroll" => magic_missile_scroll(ecs, x, y),
             "Dart" => dart(ecs, x, y),
+            "Dagger" => dagger(ecs, x, y),
+            "Shield" => shield(ecs, x, y),
+            "Longsword" => longsword(ecs, x, y),
+            "Tower Shield" => tower_shield(ecs, x, y),
             _ => {}
         }
     }
@@ -184,13 +188,85 @@ fn confusion_scroll(ecs: &mut World, x: i32, y: i32) {
         .build();
 }
 
+fn dagger(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('/'),
+            fg: RGB::named(rltk::WHITESMOKE),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Dagger".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Melee })
+        .with(MeleePowerBonus{ power: 2 })
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn shield(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('0'),
+            fg: RGB::named(rltk::WHITESMOKE),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Shield".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Shield })
+        .with(DefenseBonus{ defense: 1 })
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn longsword(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('|'),
+            fg: RGB::named(rltk::YELLOW),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Longsword".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Melee })
+        .with(MeleePowerBonus{ power: 4 })
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
+fn tower_shield(ecs: &mut World, x: i32, y: i32) {
+    ecs.create_entity()
+        .with(Position{ x, y })
+        .with(Renderable{
+            glyph: rltk::to_cp437('['),
+            fg: RGB::named(rltk::YELLOW),
+            bg: RGB::named(rltk::BLACK),
+            render_order: 2
+        })
+        .with(Name{ name : "Tower Shield".to_string() })
+        .with(Item{})
+        .with(Equippable{ slot: EquipmentSlot::Shield })
+        .with(DefenseBonus{ defense: 3 })
+        .marked::<SimpleMarker<SerializeMe>>()
+        .build();
+}
+
 fn room_table(map_depth: i32) -> RandomTable {
     RandomTable::new()
-        .add("Goblin", 11)
+        .add("Goblin", 15)
         .add("Orc", 0 + map_depth)
         .add("Health Potion", 4)
-        .add("Fireball Scroll", 1 + map_depth)
+        .add("Fireball Scroll", 0 + map_depth)
         .add("Confusion Scroll", 1 + map_depth)
         .add("Magic Missile Scroll", 2)
         .add("Dart", 4)
+        .add("Dagger", 2)
+        .add("Shield", 2)
+        .add("Longsword", map_depth - 2)
+        .add("Tower Shield", map_depth - 2)
 }
