@@ -326,6 +326,6 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Longsword", i32::min(map_depth, 6) - 2)
         .add("Tower Shield", i32::min(map_depth, 6) - 2)
         .add("Rations", 10)
-        .add("Ambrosia", /*i32::min(map_depth, 25) - 15*/400)
-        .add("Scroll of Mapping", 400)
+        .add("Ambrosia", i32::min(map_depth, 25) - 15)
+        .add("Scroll of Mapping", 2)
 }
