@@ -19,6 +19,16 @@ pub struct Renderable {
     pub render_order : i32
 }
 
+
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
+pub enum HungerState { WellFed, Normal, Hungry, Starving }
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct HungerClock {
+    pub state : HungerState,
+    pub duration : i32
+}
+
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct Player {}
 
@@ -169,3 +179,6 @@ pub struct SerializeMe;
 pub struct SerializationHelper {
     pub map : super::map::Map
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct ProvidesFood {}

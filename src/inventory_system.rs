@@ -1,6 +1,6 @@
 use specs::prelude::*;
 use crate::particle_system::ParticleBuilder;
-use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, WantsToUseItem, Consumable, ProvidesHealing, CombatStats, WantsToDropItem, InflictsDamage, Map, SufferDamage, AreaOfEffect, Confusion, Equippable, Equipped, WantsToRemoveItem};
+use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, WantsToUseItem, Consumable, ProvidesHealing, CombatStats, WantsToDropItem, InflictsDamage, Map, SufferDamage, AreaOfEffect, Confusion, Equippable, Equipped, WantsToRemoveItem, HungerState, HungerClock, ProvidesFood};
 
 pub struct ItemCollectionSystem {}
 
@@ -51,14 +51,17 @@ impl<'a> System<'a> for ItemUseSystem {
                         WriteStorage<'a, Equipped>,
                         WriteStorage<'a, InBackpack>,
                         WriteExpect<'a, ParticleBuilder>,
-                        ReadStorage<'a, Position>
+                        ReadStorage<'a, Position>,
+                        ReadStorage<'a, ProvidesFood>,
+                        WriteStorage<'a, HungerClock>
     );
 
     #[allow(clippy::cognitive_complexity)]
     fn run(&mut self, data : Self::SystemData) {
         let (player_entity, mut gamelog, map, entities, mut wants_use, names,
             consumables, healing, inflict_damage, mut combat_stats, mut suffer_damage,
-            aoe, mut confused, equippable, mut equipped, mut backpack, mut particle_builder, positions) = data;
+            aoe, mut confused, equippable, mut equipped, mut backpack, mut particle_builder, positions,
+            provides_food, mut hunger_clocks) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
             let mut used_item = true;
@@ -127,6 +130,22 @@ impl<'a> System<'a> for ItemUseSystem {
 
                         particle_builder.request(positions.get(*player_entity).unwrap().x, positions.get(*player_entity).unwrap().y, rltk::RGB::named(rltk::WHITESMOKE),
                                                  rltk::RGB::named(rltk::BLACK), rltk::to_cp437('+'), 200.0);
+                    }
+                }
+            }
+
+            // It it is edible, eat it!
+            let item_edible = provides_food.get(useitem.item);
+            match item_edible {
+                None => {}
+                Some(_) => {
+                    used_item = true;
+                    let target = targets[0];
+                    let hc = hunger_clocks.get_mut(target);
+                    if let Some(hc) = hc {
+                        hc.state = HungerState::WellFed;
+                        hc.duration = 20;
+                        gamelog.entries.push(format!("You eat the {}.", names.get(useitem.item).unwrap().name));
                     }
                 }
             }
