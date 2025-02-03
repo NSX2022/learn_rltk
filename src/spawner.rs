@@ -300,7 +300,7 @@ fn magic_mapping_scroll(ecs: &mut World, x: i32, y: i32) {
         .with(Position{ x, y })
         .with(Renderable{
             glyph: rltk::to_cp437(')'),
-            fg: RGB::named(rltk::DARKOLIVEGREEN3),
+            fg: RGB::named(rltk::MAROON3),
             bg: RGB::named(rltk::BLACK),
             render_order: 2
         })
@@ -326,6 +326,6 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Longsword", i32::min(map_depth, 6) - 2)
         .add("Tower Shield", i32::min(map_depth, 6) - 2)
         .add("Rations", 10)
-        .add("Ambrosia", i32::min(map_depth, 25) - 15)
+        .add("Ambrosia", /*i32::min(map_depth, 25) - 15*/400)
         .add("Scroll of Mapping", 400)
 }

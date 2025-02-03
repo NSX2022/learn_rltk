@@ -1,6 +1,6 @@
 use specs::prelude::*;
 use crate::particle_system::ParticleBuilder;
-use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, WantsToUseItem, Consumable, ProvidesHealing, CombatStats, WantsToDropItem, InflictsDamage, Map, SufferDamage, AreaOfEffect, Confusion, Equippable, Equipped, WantsToRemoveItem, HungerState, HungerClock, ProvidesFood};
+use super::{WantsToPickupItem, Name, InBackpack, Position, gamelog::GameLog, WantsToUseItem, Consumable, ProvidesHealing, CombatStats, WantsToDropItem, InflictsDamage, Map, SufferDamage, AreaOfEffect, Confusion, Equippable, Equipped, WantsToRemoveItem, HungerState, HungerClock, ProvidesFood, MagicMapper, RunState};
 
 pub struct ItemCollectionSystem {}
 
@@ -36,7 +36,7 @@ impl<'a> System<'a> for ItemUseSystem {
     #[allow(clippy::type_complexity)]
     type SystemData = ( ReadExpect<'a, Entity>,
                         WriteExpect<'a, GameLog>,
-                        ReadExpect<'a, Map>,
+                        WriteExpect<'a, Map>,
                         Entities<'a>,
                         WriteStorage<'a, WantsToUseItem>,
                         ReadStorage<'a, Name>,
@@ -50,18 +50,21 @@ impl<'a> System<'a> for ItemUseSystem {
                         ReadStorage<'a, Equippable>,
                         WriteStorage<'a, Equipped>,
                         WriteStorage<'a, InBackpack>,
+                        //use WriteExpect when deffering the variable you want to mutate
                         WriteExpect<'a, ParticleBuilder>,
                         ReadStorage<'a, Position>,
                         ReadStorage<'a, ProvidesFood>,
-                        WriteStorage<'a, HungerClock>
+                        WriteStorage<'a, HungerClock>,
+                        ReadStorage<'a, MagicMapper>,
+                        WriteExpect<'a, RunState>
     );
 
     #[allow(clippy::cognitive_complexity)]
     fn run(&mut self, data : Self::SystemData) {
-        let (player_entity, mut gamelog, map, entities, mut wants_use, names,
+        let (player_entity, mut gamelog, mut map, entities, mut wants_use, names,
             consumables, healing, inflict_damage, mut combat_stats, mut suffer_damage,
             aoe, mut confused, equippable, mut equipped, mut backpack, mut particle_builder, positions,
-            provides_food, mut hunger_clocks) = data;
+            provides_food, mut hunger_clocks, magic_mapper, mut runstate) = data;
 
         for (entity, useitem) in (&entities, &wants_use).join() {
             let mut used_item = true;
@@ -134,7 +137,7 @@ impl<'a> System<'a> for ItemUseSystem {
                 }
             }
 
-            // It it is edible, eat it!
+            // If it is edible, eat it!
             let item_edible = provides_food.get(useitem.item);
             match item_edible {
                 None => {}
@@ -144,9 +147,20 @@ impl<'a> System<'a> for ItemUseSystem {
                     let hc = hunger_clocks.get_mut(target);
                     if let Some(hc) = hc {
                         hc.state = HungerState::WellFed;
-                        hc.duration = 20;
+                        hc.duration = 50; //buff and nerf as needed
                         gamelog.entries.push(format!("You eat the {}.", names.get(useitem.item).unwrap().name));
                     }
+                }
+            }
+
+            // If it's a magic mapper...
+            let is_mapper = magic_mapper.get(useitem.item);
+            match is_mapper {
+                None => {}
+                Some(_) => {
+                    used_item = true;
+                    gamelog.entries.push("The map is revealed to you!".to_string());
+                    *runstate = RunState::MagicMapReveal{ row : 0};
                 }
             }
 
