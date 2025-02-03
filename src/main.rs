@@ -28,10 +28,12 @@ mod spawner;
 mod inventory_system;
 use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem };
 use crate::inventory_system::ItemRemoveSystem;
+use crate::particle_system::ParticleBuilder;
 use crate::saveload_system::clear_ecs;
 
 pub mod saveload_system;
 mod random_table;
+mod particle_system;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { AwaitingInput,
@@ -72,6 +74,8 @@ impl State {
         drop_items.run_now(&self.ecs);
         let mut item_remove = ItemRemoveSystem{};
         item_remove.run_now(&self.ecs);
+        let mut particles = particle_system::ParticleSpawnSystem{};
+        particles.run_now(&self.ecs);
 
         self.ecs.maintain();
     }
@@ -223,6 +227,7 @@ impl GameState for State {
         }
 
         ctx.cls();
+        particle_system::cull_dead_particles(&mut self.ecs, ctx);
 
         match newrunstate {
             RunState::MainMenu{..} => {}
@@ -416,6 +421,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<DefenseBonus>();
     gs.ecs.register::<MeleePowerBonus>();
     gs.ecs.register::<WantsToRemoveItem>();
+    gs.ecs.register::<ParticleLifetime>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
@@ -432,6 +438,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(player_entity);
+    gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(RunState::MainMenu{ menu_selection: gui::MainMenuSelection::NewGame });
     gs.ecs.insert(gamelog::GameLog{ entries : vec!["Enter the Dungeon".to_string()] });
 

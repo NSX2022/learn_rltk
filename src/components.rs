@@ -154,6 +154,11 @@ pub struct WantsToRemoveItem {
     pub item : Entity
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct ParticleLifetime {
+    pub lifetime_ms : f32
+}
+
 // Serialization helper code. We need to implement ConvertSaveload for each type that contains an
 // Entity.
 
