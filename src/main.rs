@@ -353,6 +353,7 @@ impl GameState for State {
                 }
             }
             RunState::GameOver => {
+                self.game_over_cleanup();
                 let result = gui::game_over(ctx);
                 match result {
                     gui::GameOverResult::NoSelection => {}
