@@ -108,6 +108,9 @@ impl<'a> System<'a> for ItemUseSystem {
                             to_unequip.push(item_entity);
                             if target == *player_entity {
                                 gamelog.entries.push(format!("You unequip {}.", name.name));
+
+                                particle_builder.request(positions.get(*player_entity).unwrap().x, positions.get(*player_entity).unwrap().y, rltk::RGB::named(rltk::WHITESMOKE),
+                                                         rltk::RGB::named(rltk::BLACK), rltk::to_cp437('-'), 200.0);
                             }
                         }
                     }
@@ -121,6 +124,9 @@ impl<'a> System<'a> for ItemUseSystem {
                     backpack.remove(useitem.item);
                     if target == *player_entity {
                         gamelog.entries.push(format!("You equip {}.", names.get(useitem.item).unwrap().name));
+
+                        particle_builder.request(positions.get(*player_entity).unwrap().x, positions.get(*player_entity).unwrap().y, rltk::RGB::named(rltk::WHITESMOKE),
+                                                 rltk::RGB::named(rltk::BLACK), rltk::to_cp437('+'), 200.0);
                     }
                 }
             }
