@@ -1,7 +1,8 @@
-use rltk::{ RGB, Rltk, BaseMap, Algorithm2D, Point };
+use rltk::{RGB, Rltk, BaseMap, Algorithm2D, Point, BTerm};
 use specs::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashSet;
+use crate::SHOW_MAPGEN_VISUALIZER;
 
 pub const MAPWIDTH : usize = 80;
 pub const MAPHEIGHT : usize = 43;
@@ -143,9 +144,7 @@ fn wall_glyph(map : &Map, x: i32, y:i32) -> rltk::FontCharType {
     }
 }
 
-pub fn draw_map(ecs: &World, ctx : &mut Rltk) {
-    let map = ecs.fetch::<Map>();
-
+pub fn draw_map(map : &Map, ctx : &mut Rltk) {
     let mut y = 0;
     let mut x = 0;
     for (idx,tile) in map.tiles.iter().enumerate() {

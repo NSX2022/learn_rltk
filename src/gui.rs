@@ -1,11 +1,10 @@
 use rltk::{RGB, Rltk, Point, VirtualKeyCode, BTerm};
 use specs::prelude::*;
 use crate::rex_assets::RexAssets;
-use super::{CombatStats, Player, gamelog::GameLog, Map, Name, Position, State, InBackpack, Viewshed, RunState, Equipped, HungerState, HungerClock, Hidden};
+use super::{CombatStats, Player, gamelog::GameLog, Map, Name, Position, State, InBackpack, Viewshed, RunState, Equipped, HungerState, HungerClock, Hidden, SHOW_MAPGEN_VISUALIZER};
 
 pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
     ctx.draw_box(0, 43, 79, 6, RGB::named(rltk::WHITE), RGB::named(rltk::BLACK));
-
 
     let map = ecs.fetch::<Map>();
     let depth = format!("Depth: {}", map.depth);
@@ -234,7 +233,9 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
 
-    ctx.render_xp_sprite(&assets.menu, 0, 0);
+    if !SHOW_MAPGEN_VISUALIZER{
+        ctx.render_xp_sprite(&assets.menu, 0, 0);
+    }
 
     ctx.draw_box_double(24, 18, 31, 10, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
     ctx.print_color_centered(20, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Learn RLTK");
