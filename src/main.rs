@@ -35,6 +35,7 @@ pub mod saveload_system;
 mod random_table;
 mod particle_system;
 mod hunger_system;
+mod rex_assets;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { AwaitingInput,
@@ -459,6 +460,7 @@ fn main() -> rltk::BError {
         spawner::spawn_room(&mut gs.ecs, room, 1);
     }
 
+    gs.ecs.insert(rex_assets::RexAssets::new());
     gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(player_entity);
