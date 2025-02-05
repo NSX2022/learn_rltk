@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
+use specs::shred::Fetch;
 use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation};
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, MAPHEIGHT, TileType};
+use crate::Map;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -33,20 +35,25 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
     let spawn_table = room_table(map_depth);
     let mut spawn_points : HashMap<usize, String> = HashMap::new();
 
-    // Scope to keep the borrow checker happy
+    // Create the spawn points in a separate scope
     {
-        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
+        // Get map data in a contained scope
+        let map = ecs.fetch::<Map>();
+        let tiles = map.tiles.to_vec();
+        let blocked = map.blocked.to_vec();
+        drop(map);  // Explicitly drop the map borrow
 
+        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
         let num_spawns = rng.roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3;
 
         for _i in 0 .. num_spawns {
             let mut added = false;
             let mut tries = 0;
-            while !added && tries < 20 {
+            while !added && tries < 30 {
                 let x = (room.x1 + rng.roll_dice(1, i32::abs(room.x2 - room.x1))) as usize;
                 let y = (room.y1 + rng.roll_dice(1, i32::abs(room.y2 - room.y1))) as usize;
                 let idx = (y * MAPWIDTH) + x;
-                if !spawn_points.contains_key(&idx) {
+                if !spawn_points.contains_key(&idx) && is_tile_valid_for_spawning(&tiles, &blocked, idx) {
                     spawn_points.insert(idx, spawn_table.roll(&mut rng));
                     added = true;
                 } else {
@@ -56,7 +63,7 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
         }
     }
 
-    // Actually spawn the monsters
+    // Now spawn the entities without any map borrow conflicts
     for spawn in spawn_points.iter() {
         let x = (*spawn.0 % MAPWIDTH) as i32;
         let y = (*spawn.0 / MAPWIDTH) as i32;
@@ -80,6 +87,17 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
             _ => {}
         }
     }
+}
+
+/// Checks if a tile is valid for spawning
+fn is_tile_valid_for_spawning(tiles: &[TileType], blocked: &[bool], idx: usize) -> bool {
+    // Ensure the tile is within map bounds
+    if idx >= MAPWIDTH * MAPHEIGHT {
+        return false;
+    }
+
+    // Check if the tile is a floor and not blocked
+    tiles[idx] == TileType::Floor && !blocked[idx]
 }
 
 fn orc(ecs: &mut World, x: i32, y: i32) { monster(ecs, x, y, rltk::to_cp437('o'), "Orc"); }

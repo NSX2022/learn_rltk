@@ -274,6 +274,7 @@ impl GameState for State {
                         }
                     } else {
                         // If mapgen_index is out of bounds, transition to the next state
+                        eprintln!("Index {} out of bounds for len {} at RunState::MapGeneration in main.rs", self.mapgen_index, self.mapgen_history.len());
                         newrunstate = self.mapgen_next_state.unwrap();
                     }
                 }
@@ -384,6 +385,7 @@ impl State {
         builder.build_map();
         self.mapgen_history = builder.get_snapshot_history();
         let player_start;
+
         {
             let mut worldmap_resource = self.ecs.write_resource::<Map>();
             *worldmap_resource = builder.get_map(); // Ensure the map is updated in the ECS
