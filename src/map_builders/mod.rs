@@ -4,11 +4,13 @@ use simple_map::SimpleMapBuilder;
 mod common;
 mod bsp_dungeon;
 mod bsp_interior;
+mod cellular_automata;
 
 use common::*;
 use specs::prelude::*;
 use crate::map_builders::bsp_dungeon::BspDungeonBuilder;
 use crate::map_builders::bsp_interior::BspInteriorBuilder;
+use crate::map_builders::cellular_automata::CellularAutomataBuilder;
 
 const MIN_ROOM_SIZE: i32 = 3;
 
@@ -24,10 +26,11 @@ pub trait MapBuilder {
 
 pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
     /*let mut rng = rltk::RandomNumberGenerator::new();
-    let builder = rng.roll_dice(1, 2);
+    let builder = rng.roll_dice(1, 3);
     match builder {
         1 => Box::new(BspDungeonBuilder::new(new_depth)),
+        2 => Box::new(BspInteriorBuilder::new(new_depth)),
         _ => Box::new(SimpleMapBuilder::new(new_depth))
     }*/
-    Box::new(BspInteriorBuilder::new(new_depth))
+    Box::new(CellularAutomataBuilder::new(new_depth))
 }

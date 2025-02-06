@@ -7,7 +7,7 @@ use crate::random_table::RandomTable;
 use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, MAPHEIGHT, TileType};
 use crate::Map;
 
-/// Spawns the player and returns his/her entity object.
+/// Spawns the player and returns its entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
     ecs
         .create_entity()
@@ -366,4 +366,54 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Ambrosia", i32::min(map_depth, 25) - 15)
         .add("Scroll of Mapping", 2)
         .add("Bear Trap", i32::min(map_depth, 6) - 4)
+}
+
+pub fn spawn_region(ecs: &mut World, area : &[usize], map_depth: i32) {
+    let spawn_table = room_table(map_depth);
+    let mut spawn_points : HashMap<usize, String> = HashMap::new();
+    let mut areas : Vec<usize> = Vec::from(area);
+
+    // Scope to keep the borrow checker happy
+    {
+        let mut rng = ecs.write_resource::<RandomNumberGenerator>();
+        let num_spawns = i32::min(areas.len() as i32, rng.roll_dice(1, MAX_MONSTERS + 3) + (map_depth - 1) - 3);
+        if num_spawns == 0 { return; }
+
+        for _i in 0 .. num_spawns {
+            let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
+            let map_idx = areas[array_index];
+            spawn_points.insert(map_idx, spawn_table.roll(&mut rng));
+            areas.remove(array_index);
+        }
+    }
+
+    // Actually spawn the monsters
+    for spawn in spawn_points.iter() {
+        spawn_entity(ecs, &spawn);
+    }
+}
+
+/// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
+fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
+    let x = (*spawn.0 % MAPWIDTH) as i32;
+    let y = (*spawn.0 / MAPWIDTH) as i32;
+
+    match spawn.1.as_ref() {
+        "Goblin" => goblin(ecs, x, y),
+        "Orc" => orc(ecs, x, y),
+        "Health Potion" => health_potion(ecs, x, y),
+        "Fireball Scroll" => fireball_scroll(ecs, x, y),
+        "Confusion Scroll" => confusion_scroll(ecs, x, y),
+        "Magic Missile Scroll" => magic_missile_scroll(ecs, x, y),
+        "Dart" => dart(ecs, x, y),
+        "Dagger" => dagger(ecs, x, y),
+        "Shield" => shield(ecs, x, y),
+        "Longsword" => longsword(ecs, x, y),
+        "Tower Shield" => tower_shield(ecs, x, y),
+        "Rations" => rations(ecs, x, y),
+        "Ambrosia" => ambrosia(ecs, x, y),
+        "Scroll of Mapping" => magic_mapping_scroll(ecs, x, y),
+        "Bear Trap" => bear_trap(ecs, x, y),
+        _ => {}
+    }
 }
