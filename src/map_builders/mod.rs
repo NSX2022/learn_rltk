@@ -13,12 +13,14 @@ mod common;
 mod maze;
 mod dla;
 mod voronoi;
+mod waveform_collapse;
 
 use common::*;
 use specs::prelude::*;
 use crate::map_builders::dla::DLABuilder;
 use crate::map_builders::maze::MazeBuilder;
 use crate::map_builders::voronoi::VoronoiCellBuilder;
+use crate::map_builders::waveform_collapse::WaveformCollapseBuilder;
 
 pub trait MapBuilder {
     fn build_map(&mut self);
@@ -29,9 +31,11 @@ pub trait MapBuilder {
     fn take_snapshot(&mut self);
 }
 
+
 pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
+    /*
     let mut rng = rltk::RandomNumberGenerator::new();
-    let builder = rng.roll_dice(1, 7);
+    let builder = rng.roll_dice(1, 16);
     match builder {
         1 => Box::new(BspDungeonBuilder::new(new_depth)),
         2 => Box::new(BspInteriorBuilder::new(new_depth)),
@@ -49,5 +53,6 @@ pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
         14 => Box::new(VoronoiCellBuilder::pythagoras(new_depth)),
         15 => Box::new(VoronoiCellBuilder::manhattan(new_depth)),
         _ => Box::new(SimpleMapBuilder::new(new_depth))
-    }
+    }*/
+    Box::new(WaveformCollapseBuilder::new(new_depth))
 }
