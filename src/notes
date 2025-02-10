@@ -1,0 +1,9 @@
+Inventory having too many items leads to overflow via going above the amount of available chars
+
+Repeatedly using Confusion Scroll on enemies can negate(?) status effect
+
+You can apply statuses to items by targeting them on the ground when using a status scroll
+
+When there is no save, Load Game is hidden (good) but is still selectable
+
+!BspInterior can generate entities in walls
