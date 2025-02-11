@@ -28,6 +28,7 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
 }
 
 const MAX_MONSTERS : i32 = 3;
+#[allow(dead_code)]
 const MAX_ITEMS : i32 = 2;
 
 #[allow(clippy::map_entry)]

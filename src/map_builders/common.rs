@@ -5,6 +5,7 @@ use crate::Rect;
 
 
 #[derive(PartialEq, Copy, Clone)]
+#[allow(dead_code)]
 pub enum Symmetry { None, Horizontal, Vertical, Both }
 
 ///This class contains methods commonly used in map-building

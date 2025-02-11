@@ -18,8 +18,11 @@ use common::*;
 mod voronoi;
 use voronoi::*;
 mod waveform_collapse;
+mod prefab_builder;
+
 use waveform_collapse::*;
 use specs::prelude::*;
+use crate::map_builders::prefab_builder::PrefabBuilder;
 use crate::rex_assets::RexAssets;
 
 pub trait MapBuilder {
@@ -32,10 +35,11 @@ pub trait MapBuilder {
 }
 
 pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
+    /*
     let mut rng = rltk::RandomNumberGenerator::new();
-    let builder = rng.roll_dice(1, 17);
+    let builder = rng.roll_dice(1, 16);
     let mut result : Box<dyn MapBuilder>;
-    match 9 {
+    match builder {
         1 => { result = Box::new(BspDungeonBuilder::new(new_depth)); }
         2 => { result = Box::new(BspInteriorBuilder::new(new_depth)); }
         3 => { result = Box::new(CellularAutomataBuilder::new(new_depth)); }
@@ -51,13 +55,14 @@ pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
         13 => { result = Box::new(DLABuilder::insectoid(new_depth)); }
         14 => { result = Box::new(VoronoiCellBuilder::pythagoras(new_depth)); }
         15 => { result = Box::new(VoronoiCellBuilder::manhattan(new_depth)); }
-        16 => { result = Box::new(WaveformCollapseBuilder::test_map(new_depth)); }
         _ => { result = Box::new(SimpleMapBuilder::new(new_depth)); }
     }
 
-    if /*rng.roll_dice(1, 3)==1*/ true {
+    if rng.roll_dice(1, 3)==1 {
         result = Box::new(WaveformCollapseBuilder::derived_map(new_depth, result));
     }
 
-    result
+    result*/
+
+    Box::new(PrefabBuilder::new(new_depth))
 }

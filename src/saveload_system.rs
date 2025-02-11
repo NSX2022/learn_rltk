@@ -1,11 +1,13 @@
 use specs::prelude::*;
 use specs::saveload::{SimpleMarker, SimpleMarkerAllocator, SerializeComponents, DeserializeComponents, MarkedBuilder};
+#[allow(deprecated)]
 use specs::error::NoError;
 use super::components::*;
 use std::fs::File;
 use std::path::Path;
 use std::fs;
 
+#[allow(deprecated)]
 macro_rules! serialize_individually {
     ($ecs:expr, $ser:expr, $data:expr, $( $type:ty),*) => {
         $(
@@ -57,6 +59,7 @@ pub fn does_save_exist() -> bool {
     Path::new("./savegame.json").exists()
 }
 
+#[allow(deprecated)]
 macro_rules! deserialize_individually {
     ($ecs:expr, $de:expr, $data:expr, $( $type:ty),*) => {
         $(
