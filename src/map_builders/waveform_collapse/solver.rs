@@ -84,6 +84,9 @@ impl Solver {
     pub fn iteration(&mut self, map: &mut Map, rng : &mut super::RandomNumberGenerator) -> bool {
         if self.remaining.is_empty() { return true; }
 
+        let mut tries:i32 = 0;
+        const MAX_TRIES:i32 = 400;
+
         // Populate the neighbor count of the remaining list
         let mut remain_copy = self.remaining.clone();
         let mut neighbors_exist = false;
@@ -187,14 +190,19 @@ impl Solver {
             }
 
             let mut possible_options : Vec<usize> = Vec::new();
-            for new_chunk_idx in options_to_check.iter() {
-                let mut possible = true;
-                for o in options.iter() {
-                    if !o.contains(new_chunk_idx) { possible = false; }
+            if tries < MAX_TRIES {
+                for new_chunk_idx in options_to_check.iter() {
+                    let mut possible = true;
+                    for o in options.iter() {
+                        if !o.contains(new_chunk_idx) { possible = false; }
+                        tries += 1;
+                    }
+                    if possible {
+                        possible_options.push(*new_chunk_idx);
+                    }
                 }
-                if possible {
-                    possible_options.push(*new_chunk_idx);
-                }
+            }else{
+                return false;
             }
 
             if possible_options.is_empty() {
