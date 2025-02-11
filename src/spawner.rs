@@ -84,7 +84,7 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
             "Rations" => rations(ecs, x, y),
             "Ambrosia" => ambrosia(ecs, x, y),
             "Scroll of Mapping" => magic_mapping_scroll(ecs, x, y),
-            "Bear Trap" => bear_trap(ecs, x, y),
+            "Clamp Trap" => bear_trap(ecs, x, y),
             _ => {}
         }
     }
@@ -366,7 +366,7 @@ fn room_table(map_depth: i32) -> RandomTable {
         .add("Rations", 8)
         .add("Ambrosia", i32::min(map_depth, 25) - 15)
         .add("Scroll of Mapping", 2)
-        .add("Bear Trap", i32::min(map_depth, 6) - 4)
+        .add("Clamp Trap", i32::min(map_depth, 6) - 4)
 }
 
 pub fn spawn_region(ecs: &mut World, area : &[usize], map_depth: i32) {
@@ -395,7 +395,7 @@ pub fn spawn_region(ecs: &mut World, area : &[usize], map_depth: i32) {
 }
 
 /// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
-fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
+pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let x = (*spawn.0 % MAPWIDTH) as i32;
     let y = (*spawn.0 / MAPWIDTH) as i32;
 
@@ -414,7 +414,7 @@ fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
         "Rations" => rations(ecs, x, y),
         "Ambrosia" => ambrosia(ecs, x, y),
         "Scroll of Mapping" => magic_mapping_scroll(ecs, x, y),
-        "Bear Trap" => bear_trap(ecs, x, y),
+        "Clamp Trap" => bear_trap(ecs, x, y),
         _ => {}
     }
 }

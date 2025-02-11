@@ -22,7 +22,7 @@ mod prefab_builder;
 
 use waveform_collapse::*;
 use specs::prelude::*;
-use crate::map_builders::prefab_builder::PrefabBuilder;
+use crate::map_builders::r#mod::PrefabBuilder;
 use crate::rex_assets::RexAssets;
 
 pub trait MapBuilder {
