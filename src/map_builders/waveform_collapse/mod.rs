@@ -1,8 +1,6 @@
 use super::{MapBuilder, Map, TileType, Position, spawner,
             generate_voronoi_spawn_regions, remove_unreachable_areas_returning_most_distant};
 use rltk::RandomNumberGenerator;
-mod image_loader;
-use image_loader::*;
 use specs::prelude::*;
 use std::collections::HashMap;
 mod common;
@@ -27,7 +25,6 @@ pub struct WaveformCollapseBuilder {
     depth: i32,
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
-    mode : WaveformMode,
     derive_from : Option<Box<dyn MapBuilder>>
 }
 
@@ -70,23 +67,15 @@ impl WaveformCollapseBuilder {
     /// # Arguments
     /// * new_depth - the new map depth
     /// * derive_from - either None, or a boxed MapBuilder, as output by `random_builder`
-    pub fn new(new_depth : i32, mode : WaveformMode, derive_from : Option<Box<dyn MapBuilder>>) -> WaveformCollapseBuilder {
+    pub fn new(new_depth : i32, derive_from : Option<Box<dyn MapBuilder>>) -> WaveformCollapseBuilder {
         WaveformCollapseBuilder{
             map : Map::new(new_depth),
             starting_position : Position{ x: 0, y : 0 },
             depth : new_depth,
             history: Vec::new(),
             noise_areas : HashMap::new(),
-            mode,
             derive_from
         }
-    }
-
-    /// Creates a Wave Function Collapse builder using the baked-in WFC test map.
-    /// # Arguments
-    /// * new_depth - the new map depth
-    pub fn test_map(new_depth: i32) -> WaveformCollapseBuilder {
-        WaveformCollapseBuilder::new(new_depth, WaveformMode::TestMap, None)
     }
 
     /// Derives a map from a pre-existing map builder.
@@ -94,16 +83,10 @@ impl WaveformCollapseBuilder {
     /// * new_depth - the new map depth
     /// * derive_from - either None, or a boxed MapBuilder, as output by `random_builder`
     pub fn derived_map(new_depth: i32, builder: Box<dyn MapBuilder>) -> WaveformCollapseBuilder {
-        WaveformCollapseBuilder::new(new_depth, WaveformMode::Derived, Some(builder))
+        WaveformCollapseBuilder::new(new_depth, Some(builder))
     }
 
     fn build(&mut self) {
-        if self.mode == WaveformMode::TestMap {
-            self.map = load_rex_map(self.depth, &rltk::rex::XpFile::from_resource("resources/wfc-demo1.xp").unwrap());
-            self.take_snapshot();
-            return;
-        }
-
         let mut rng = RandomNumberGenerator::new();
 
         const CHUNK_SIZE :i32 = 8;
