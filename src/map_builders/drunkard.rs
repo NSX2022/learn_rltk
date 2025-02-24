@@ -24,7 +24,8 @@ pub struct DrunkardsWalkBuilder {
     depth: i32,
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
-    settings : DrunkardSettings
+    settings : DrunkardSettings,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for DrunkardsWalkBuilder {
@@ -59,6 +60,10 @@ impl MapBuilder for DrunkardsWalkBuilder {
             self.history.push(snapshot);
         }
     }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
 }
 
 impl DrunkardsWalkBuilder {
@@ -70,7 +75,8 @@ impl DrunkardsWalkBuilder {
             depth : new_depth,
             history: Vec::new(),
             noise_areas : HashMap::new(),
-            settings
+            settings,
+            spawn_list : Vec::new()
         }
     }
 
@@ -87,7 +93,8 @@ impl DrunkardsWalkBuilder {
                 floor_percent: 0.5,
                 brush_size: 1,
                 symmetry: Symmetry::None
-            }
+            },
+            spawn_list : Vec::new()
         }
     }
 
@@ -104,7 +111,8 @@ impl DrunkardsWalkBuilder {
                 floor_percent: 0.5,
                 brush_size: 1,
                 symmetry: Symmetry::None
-            }
+            },
+            spawn_list : Vec::new()
         }
     }
 
@@ -121,7 +129,8 @@ impl DrunkardsWalkBuilder {
                 floor_percent: 0.4,
                 brush_size: 1,
                 symmetry: Symmetry::None
-            }
+            },
+            spawn_list : Vec::new()
         }
     }
 
@@ -138,7 +147,8 @@ impl DrunkardsWalkBuilder {
                 floor_percent: 0.4,
                 brush_size: 2,
                 symmetry: Symmetry::None
-            }
+            },
+            spawn_list : Vec::new()
         }
     }
 
@@ -155,7 +165,8 @@ impl DrunkardsWalkBuilder {
                 floor_percent: 0.4,
                 brush_size: 1,
                 symmetry: Symmetry::Both
-            }
+            },
+            spawn_list : Vec::new()
         }
     }
 

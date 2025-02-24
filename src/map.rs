@@ -1,10 +1,7 @@
-#[allow(unused_imports)]
-use rltk::{RGB, Rltk, BaseMap, Algorithm2D, Point, BTerm};
+use rltk::{ RGB, Rltk, BaseMap, Algorithm2D, Point };
 use specs::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashSet;
-#[allow(unused_imports)]
-use crate::SHOW_MAPGEN_VISUALIZER;
 
 pub const MAPWIDTH : usize = 80;
 pub const MAPHEIGHT : usize = 43;

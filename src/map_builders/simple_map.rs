@@ -10,7 +10,8 @@ pub struct SimpleMapBuilder {
     starting_position : Position,
     depth: i32,
     rooms: Vec<Rect>,
-    history: Vec<Map>
+    history: Vec<Map>,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for SimpleMapBuilder {
@@ -45,6 +46,10 @@ impl MapBuilder for SimpleMapBuilder {
             self.history.push(snapshot);
         }
     }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
 }
 
 impl SimpleMapBuilder {
@@ -54,7 +59,8 @@ impl SimpleMapBuilder {
             starting_position : Position{ x: 0, y : 0 },
             depth : new_depth,
             rooms: Vec::new(),
-            history: Vec::new()
+            history: Vec::new(),
+            spawn_list: Vec::new()
         }
     }
 

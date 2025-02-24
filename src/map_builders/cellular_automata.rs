@@ -11,7 +11,8 @@ pub struct CellularAutomataBuilder {
     starting_position : Position,
     depth: i32,
     history: Vec<Map>,
-    noise_areas : HashMap<i32, Vec<usize>>
+    noise_areas : HashMap<i32, Vec<usize>>,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for CellularAutomataBuilder {
@@ -46,6 +47,10 @@ impl MapBuilder for CellularAutomataBuilder {
             self.history.push(snapshot);
         }
     }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
 }
 
 impl CellularAutomataBuilder {
@@ -55,7 +60,8 @@ impl CellularAutomataBuilder {
             starting_position : Position{ x: 0, y : 0 },
             depth : new_depth,
             history: Vec::new(),
-            noise_areas : HashMap::new()
+            noise_areas : HashMap::new(),
+            spawn_list : Vec::new()
         }
     }
 

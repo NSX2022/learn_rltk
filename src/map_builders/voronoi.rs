@@ -17,7 +17,8 @@ pub struct VoronoiCellBuilder {
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
     n_seeds: usize,
-    distance_algorithm: DistanceAlgorithm
+    distance_algorithm: DistanceAlgorithm,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for VoronoiCellBuilder {
@@ -52,6 +53,10 @@ impl MapBuilder for VoronoiCellBuilder {
             self.history.push(snapshot);
         }
     }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
 }
 
 impl VoronoiCellBuilder {
@@ -64,7 +69,8 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            spawn_list: Vec::new()
         }
     }
 
@@ -76,7 +82,8 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Pythagoras
+            distance_algorithm: DistanceAlgorithm::Pythagoras,
+            spawn_list: Vec::new()
         }
     }
 
@@ -88,7 +95,8 @@ impl VoronoiCellBuilder {
             history: Vec::new(),
             noise_areas : HashMap::new(),
             n_seeds: 64,
-            distance_algorithm: DistanceAlgorithm::Manhattan
+            distance_algorithm: DistanceAlgorithm::Manhattan,
+            spawn_list: Vec::new()
         }
     }
 

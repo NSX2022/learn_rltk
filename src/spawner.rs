@@ -85,7 +85,7 @@ pub fn spawn_room(ecs: &mut World, room : &Rect, map_depth: i32) {
             "Ambrosia" => ambrosia(ecs, x, y),
             "Scroll of Mapping" => magic_mapping_scroll(ecs, x, y),
             "Clamp Trap" => bear_trap(ecs, x, y),
-            _ => {}
+            _ => {eprintln!("Unknown spawn input @spawner.rs")}
         }
     }
 }

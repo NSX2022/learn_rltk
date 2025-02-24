@@ -10,7 +10,8 @@ pub struct BspDungeonBuilder {
     depth: i32,
     rooms: Vec<Rect>,
     history: Vec<Map>,
-    rects: Vec<Rect>
+    rects: Vec<Rect>,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for BspDungeonBuilder {
@@ -45,6 +46,10 @@ impl MapBuilder for BspDungeonBuilder {
             self.history.push(snapshot);
         }
     }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
 }
 
 impl BspDungeonBuilder {
@@ -55,7 +60,8 @@ impl BspDungeonBuilder {
             depth : new_depth,
             rooms: Vec::new(),
             history: Vec::new(),
-            rects: Vec::new()
+            rects: Vec::new(),
+            spawn_list: Vec::new()
         }
     }
 

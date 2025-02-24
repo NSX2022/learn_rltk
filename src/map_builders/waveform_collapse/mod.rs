@@ -25,7 +25,8 @@ pub struct WaveformCollapseBuilder {
     depth: i32,
     history: Vec<Map>,
     noise_areas : HashMap<i32, Vec<usize>>,
-    derive_from : Option<Box<dyn MapBuilder>>
+    derive_from : Option<Box<dyn MapBuilder>>,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for WaveformCollapseBuilder {
@@ -43,6 +44,10 @@ impl MapBuilder for WaveformCollapseBuilder {
 
     fn build_map(&mut self)  {
         self.build();
+    }
+
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn spawn_entities(&mut self, ecs : &mut World) {
@@ -74,7 +79,8 @@ impl WaveformCollapseBuilder {
             depth : new_depth,
             history: Vec::new(),
             noise_areas : HashMap::new(),
-            derive_from
+            derive_from,
+            spawn_list : Vec::new()
         }
     }
 

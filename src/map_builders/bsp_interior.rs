@@ -12,7 +12,8 @@ pub struct BspInteriorBuilder {
     depth: i32,
     rooms: Vec<Rect>,
     history: Vec<Map>,
-    rects: Vec<Rect>
+    rects: Vec<Rect>,
+    spawn_list: Vec<(usize, String)>
 }
 
 impl MapBuilder for BspInteriorBuilder {
@@ -38,6 +39,10 @@ impl MapBuilder for BspInteriorBuilder {
         }
     }
 
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
+    }
+
     fn take_snapshot(&mut self) {
         if SHOW_MAPGEN_VISUALIZER {
             let mut snapshot = self.map.clone();
@@ -57,7 +62,8 @@ impl BspInteriorBuilder {
             depth : new_depth,
             rooms: Vec::new(),
             history: Vec::new(),
-            rects: Vec::new()
+            rects: Vec::new(),
+            spawn_list : Vec::new()
         }
     }
 

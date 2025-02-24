@@ -18,20 +18,24 @@ use common::*;
 mod voronoi;
 use voronoi::*;
 mod waveform_collapse;
-mod prefab_builder;
-
 use waveform_collapse::*;
+mod prefab_builder;
+use prefab_builder::*;
 use specs::prelude::*;
-use crate::map_builders::r#mod::PrefabBuilder;
-use crate::rex_assets::RexAssets;
 
 pub trait MapBuilder {
     fn build_map(&mut self);
-    fn spawn_entities(&mut self, ecs : &mut World);
     fn get_map(&self) -> Map;
     fn get_starting_position(&self) -> Position;
     fn get_snapshot_history(&self) -> Vec<Map>;
     fn take_snapshot(&mut self);
+    fn get_spawn_list(&self) -> &Vec<(usize, String)>;
+
+    fn spawn_entities(&mut self, ecs : &mut World) {
+        for entity in self.get_spawn_list().iter() {
+            spawner::spawn_entity(ecs, &(&entity.0, &entity.1));
+        }
+    }
 }
 
 pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
@@ -64,5 +68,14 @@ pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
 
     result*/
 
-    Box::new(PrefabBuilder::new(new_depth))
+    Box::new(
+        PrefabBuilder::new(
+            new_depth,
+            Some(
+                Box::new(
+                    CellularAutomataBuilder::new(new_depth)
+                )
+            )
+        )
+    )
 }
