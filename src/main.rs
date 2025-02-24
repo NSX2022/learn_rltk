@@ -392,7 +392,7 @@ impl State {
             player_start = builder.get_starting_position();
         }
 
-        // Spawn bad guys
+        // Spawn chuddies
         builder.spawn_entities(&mut self.ecs);
 
         // Place the player and update resources

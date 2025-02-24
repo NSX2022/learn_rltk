@@ -32,12 +32,6 @@ impl MapBuilder for MazeBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
-    }
-
     fn take_snapshot(&mut self) {
         if SHOW_MAPGEN_VISUALIZER {
             let mut snapshot = self.map.clone();
@@ -88,6 +82,11 @@ impl MazeBuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(&self.map, &mut rng, area.1, self.depth, &mut self.spawn_list);
+        }
     }
 }
 

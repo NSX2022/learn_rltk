@@ -1,10 +1,9 @@
 use super::{MapBuilder, Map,
-            TileType, Position, spawner,
+            TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER,
             remove_unreachable_areas_returning_most_distant, generate_voronoi_spawn_regions};
 use rltk::RandomNumberGenerator;
 use specs::prelude::*;
 use std::collections::HashMap;
-use crate::SHOW_MAPGEN_VISUALIZER;
 
 #[derive(PartialEq, Copy, Clone)]
 #[allow(dead_code)]
@@ -38,10 +37,8 @@ impl MapBuilder for VoronoiCellBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs : &mut World) {
-        for area in self.noise_areas.iter() {
-            spawner::spawn_region(ecs, area.1, self.depth);
-        }
+    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
+        &self.spawn_list
     }
 
     fn take_snapshot(&mut self) {
@@ -52,10 +49,6 @@ impl MapBuilder for VoronoiCellBuilder {
             }
             self.history.push(snapshot);
         }
-    }
-
-    fn get_spawn_list(&self) -> &Vec<(usize, String)> {
-        &self.spawn_list
     }
 }
 
@@ -70,10 +63,11 @@ impl VoronoiCellBuilder {
             noise_areas : HashMap::new(),
             n_seeds: 64,
             distance_algorithm: DistanceAlgorithm::Pythagoras,
-            spawn_list: Vec::new()
+            spawn_list : Vec::new()
         }
     }
 
+    #[allow(dead_code)]
     pub fn pythagoras(new_depth : i32) -> VoronoiCellBuilder {
         VoronoiCellBuilder{
             map : Map::new(new_depth),
@@ -83,10 +77,11 @@ impl VoronoiCellBuilder {
             noise_areas : HashMap::new(),
             n_seeds: 64,
             distance_algorithm: DistanceAlgorithm::Pythagoras,
-            spawn_list: Vec::new()
+            spawn_list : Vec::new()
         }
     }
 
+    #[allow(dead_code)]
     pub fn manhattan(new_depth : i32) -> VoronoiCellBuilder {
         VoronoiCellBuilder{
             map : Map::new(new_depth),
@@ -96,7 +91,7 @@ impl VoronoiCellBuilder {
             noise_areas : HashMap::new(),
             n_seeds: 64,
             distance_algorithm: DistanceAlgorithm::Manhattan,
-            spawn_list: Vec::new()
+            spawn_list : Vec::new()
         }
     }
 
@@ -189,5 +184,10 @@ impl VoronoiCellBuilder {
 
         // Now we build a noise map for use in spawning entities later
         self.noise_areas = generate_voronoi_spawn_regions(&self.map, &mut rng);
+
+        // Spawn the entities
+        for area in self.noise_areas.iter() {
+            spawner::spawn_region(&self.map, &mut rng, area.1, self.depth, &mut self.spawn_list);
+        }
     }
 }

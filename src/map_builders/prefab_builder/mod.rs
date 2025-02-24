@@ -62,7 +62,7 @@ impl PrefabBuilder {
             starting_position : Position{ x: 0, y : 0 },
             depth : new_depth,
             history : Vec::new(),
-            mode : PrefabMode::Sectional{ section: prefab_sections::UNDERGROUND_FORT },
+            mode : PrefabMode::Sectional{ section: prefab_sections::UNDERGROUND_FOUNTAIN },
             previous_builder,
             spawn_list : Vec::new()
         }

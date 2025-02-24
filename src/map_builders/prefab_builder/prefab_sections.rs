@@ -10,7 +10,7 @@ pub enum VerticalPlacement { Top, Center, Bottom }
 #[derive(PartialEq, Copy, Clone)]
 pub struct PrefabSection {
     pub template : &'static str,
-    // Both the height and width must be EXACT or it will cause an Index Out of Bounds error!
+    // Both the height and width must be EXACT, or it will cause an Index Out of Bounds error!
     pub width : usize,
     pub height: usize,
     pub placement : (HorizontalPlacement, VerticalPlacement)
@@ -22,6 +22,14 @@ pub const UNDERGROUND_FORT : PrefabSection = PrefabSection{
     width: 15,
     height: 43,
     placement: ( HorizontalPlacement::Right, VerticalPlacement::Top )
+};
+
+#[allow(dead_code)]
+pub const UNDERGROUND_FOUNTAIN : PrefabSection = PrefabSection{
+    template : CENTER_FOUNTAIN,
+    width: 7,
+    height: 6,
+    placement: ( HorizontalPlacement::Center, VerticalPlacement::Bottom )
 };
 
 #[allow(dead_code)]
@@ -70,4 +78,15 @@ const RIGHT_FORT : &str = "
   #     #      
   #######      
      #         
+";
+
+#[allow(dead_code)]
+// The padding needs to be here!
+const CENTER_FOUNTAIN : &str = "
+ ######
+ ##  ##
+ # ## #
+ # ## #
+ ##  ##
+ ######
 ";
