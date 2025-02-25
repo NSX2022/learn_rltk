@@ -27,9 +27,9 @@ pub const UNDERGROUND_FORT : PrefabSection = PrefabSection{
 #[allow(dead_code)]
 pub const UNDERGROUND_FOUNTAIN : PrefabSection = PrefabSection{
     template : CENTER_FOUNTAIN,
-    width: 7,
-    height: 6,
-    placement: ( HorizontalPlacement::Center, VerticalPlacement::Bottom )
+    width: 8,
+    height: 7,
+    placement: ( HorizontalPlacement::Center, VerticalPlacement::Center )
 };
 
 #[allow(dead_code)]
@@ -83,10 +83,11 @@ const RIGHT_FORT : &str = "
 #[allow(dead_code)]
 // The padding needs to be here!
 const CENTER_FOUNTAIN : &str = "
- ######
- ##  ##
- # ## #
- # ## #
- ##  ##
- ######
+        
+ ## ### 
+ ##  ## 
+ # ## # 
+ # ## # 
+ ##  ## 
+ ### ## 
 ";

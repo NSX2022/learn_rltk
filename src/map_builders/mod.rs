@@ -39,7 +39,7 @@ pub trait MapBuilder {
 }
 
 pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
-    /*
+
     let mut rng = rltk::RandomNumberGenerator::new();
     let builder = rng.roll_dice(1, 16);
     let mut result : Box<dyn MapBuilder>;
@@ -66,14 +66,14 @@ pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
         result = Box::new(WaveformCollapseBuilder::derived_map(new_depth, result));
     }
 
-    result*/
+    //result
 
     Box::new(
         PrefabBuilder::new(
             new_depth,
             Some(
                 Box::new(
-                    CellularAutomataBuilder::new(new_depth)
+                    SimpleMapBuilder::new(new_depth)
                 )
             )
         )
