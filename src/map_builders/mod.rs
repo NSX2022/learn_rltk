@@ -33,6 +33,7 @@ mod room_corner_rounding;
 mod rooms_corridors_dogleg;
 mod rooms_corridors_bsp;
 mod room_sorter;
+mod room_drawer;
 
 use prefab_builder::*;
 use specs::prelude::*;
@@ -44,6 +45,7 @@ use crate::map_builders::room_based_spawner::RoomBasedSpawner;
 use crate::map_builders::room_based_stairs::RoomBasedStairs;
 use crate::map_builders::room_based_starting_position::RoomBasedStartingPosition;
 use crate::map_builders::room_corner_rounding::RoomCornerRounder;
+use crate::map_builders::room_drawer::RoomDrawer;
 use crate::map_builders::room_exploder::RoomExploder;
 use crate::map_builders::room_sorter::{RoomSort, RoomSorter};
 use crate::map_builders::rooms_corridors_bsp::BspCorridors;
@@ -172,6 +174,8 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bui
             _ => builder.with(RoomSorter::new(RoomSort::CENTRAL)),
         }
 
+        builder.with(RoomDrawer::new());
+
         let corridor_roll = rng.roll_dice(1, 2);
         match corridor_roll {
             1 => builder.with(DoglegCorridors::new()),
@@ -240,6 +244,7 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bu
     builder.with(DistantExit::new());
 }
 
+
 pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     let mut builder = BuilderChain::new(new_depth);
     let type_roll = rng.roll_dice(1, 2);
@@ -255,9 +260,6 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> 
     if rng.roll_dice(1, 20)==1 {
         builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FORT));
     }
-
-    //Clean up most WFC artifacts
-    builder.with(CullUnreachable::new());
 
     builder.with(PrefabBuilder::vaults());
 
