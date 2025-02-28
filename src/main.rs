@@ -263,7 +263,7 @@ impl GameState for State {
                         draw_map(&self.mapgen_history[self.mapgen_index], ctx);
 
                         self.mapgen_timer += ctx.frame_time_ms;
-                        if self.mapgen_timer > 50.0 {
+                        if self.mapgen_timer > 150.0 {
                             self.mapgen_timer = 0.0;
                             self.mapgen_index += 1;
 
@@ -363,8 +363,11 @@ impl State {
             to_delete.push(e);
         }
         for del in to_delete.iter() {
-            self.ecs.delete_entity(*del).expect("Deletion failed");
+            self.ecs.delete_entity(*del).expect("Deletion failed @main.rs");
         }
+        
+        //Delete previous save
+        saveload_system::delete_save();
 
         // Spawn a new player
         {
