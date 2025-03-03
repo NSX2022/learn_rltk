@@ -1,7 +1,7 @@
 use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use std::cmp::{max, min};
-use super::{Position, Player, Viewshed, State, Map, RunState, CombatStats, WantsToMelee, Item, gamelog::GameLog, WantsToPickupItem, TileType, Monster, HungerState, HungerClock, EntityMoved};
+use super::{Position, Player, Viewshed, State, Map, RunState, CombatStats, WantsToMelee, Item, gamelog::GameLog, WantsToPickupItem, TileType, Monster, HungerState, HungerClock, EntityMoved, Door, BlocksVisibility, BlocksTile, Renderable};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
@@ -12,6 +12,10 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let map = ecs.fetch::<Map>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
     let mut entity_moved = ecs.write_storage::<EntityMoved>();
+    let mut doors = ecs.write_storage::<Door>();
+    let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
+    let mut blocks_movement = ecs.write_storage::<BlocksTile>();
+    let mut renderables = ecs.write_storage::<Renderable>();
 
     for (entity, _player, pos, viewshed) in (&entities, &players, &mut positions, &mut viewsheds).join() {
         if pos.x + delta_x < 1 || pos.x + delta_x > map.width-1 || pos.y + delta_y < 1 || pos.y + delta_y > map.height-1 { return; }
@@ -23,20 +27,54 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                 wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
                 return;
             }
+            let door = doors.get_mut(*potential_target);
+            if let Some(door) = door {
+                /*door.open = true;
+                blocks_visibility.remove(*potential_target);
+                blocks_movement.remove(*potential_target);
+                let glyph = renderables.get_mut(*potential_target).unwrap();
+                glyph.glyph = rltk::to_cp437('/');
+                viewshed.dirty = true;
+                 */
+                //This lets the player open and close doors, but due to the targeting being what the player walks into,
+                //the player enters a solid door and leaves it closed behind him
+                //TODO interact with doors and chests etc. with an Interact key like E for more intentional play
+                let glyph = renderables.get_mut(*potential_target).unwrap();
+                match door.open {
+                    false => {
+                        door.open = true;
+                        blocks_visibility.remove(*potential_target);
+                        blocks_movement.remove(*potential_target);
+                        glyph.glyph = rltk::to_cp437('/');
+                        viewshed.dirty = true;
+                    }
+                    true => {
+                        door.open = false;
+                        blocks_visibility.insert(*potential_target, BlocksVisibility {}).expect("Couldn't add closing Door to blocks_visibility @player.rs");
+                        blocks_movement.insert(*potential_target, BlocksTile{}).expect("Couldn't add closing Door to blocks_movement @player.rs");
+                        glyph.glyph = rltk::to_cp437('+');
+                        viewshed.dirty = true;
+                    }
+                    _ => {
+                        panic!("Door in unknown state @player.rs")
+                    }
+                }
+            }
         }
 
         if !map.blocked[destination_idx] {
             pos.x = min(79 , max(0, pos.x + delta_x));
             pos.y = min(49, max(0, pos.y + delta_y));
+            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
 
             viewshed.dirty = true;
             let mut ppos = ecs.write_resource::<Point>();
             ppos.x = pos.x;
             ppos.y = pos.y;
-            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
         }
     }
 }
+
 
 fn get_item(ecs: &mut World) {
     let player_pos = ecs.fetch::<Point>();

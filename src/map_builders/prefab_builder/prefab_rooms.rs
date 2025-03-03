@@ -46,6 +46,25 @@ const SILLY_SMILE_MAP : &str = "
 ";
 
 #[allow(dead_code)]
+const HOLY_CROSS_MAP : &str = "
+     
+  #  
+ ### 
+  #  
+  #  
+  a  
+";
+
+#[allow(dead_code)]
+pub const HOLY_CROSS : PrefabRoom = PrefabRoom{
+    template:HOLY_CROSS_MAP,
+    width: 5,
+    height: 6,
+    first_depth: 0,
+    last_depth: 100
+};
+
+#[allow(dead_code)]
 pub const CHECKERBOARD : PrefabRoom = PrefabRoom{
     template : CHECKERBOARD_MAP,
     width: 6,

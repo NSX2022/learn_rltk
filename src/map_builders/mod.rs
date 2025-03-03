@@ -44,6 +44,7 @@ use specs::prelude::*;
 use crate::map_builders::area_starting_point::{AreaStartingPosition, XStart, YStart};
 use crate::map_builders::cull_unreachable::CullUnreachable;
 use crate::map_builders::distant_exit::DistantExit;
+use crate::map_builders::door_placement::DoorPlacement;
 use crate::map_builders::prefab_builder::PrefabMode::RoomVaults;
 use crate::map_builders::room_based_spawner::RoomBasedSpawner;
 use crate::map_builders::room_based_stairs::RoomBasedStairs;
@@ -58,20 +59,6 @@ use crate::map_builders::rooms_corridors_bsp::BspCorridors;
 use crate::map_builders::rooms_corridors_dogleg::DoglegCorridors;
 use crate::map_builders::rooms_corridors_lines::StraightLineCorridors;
 use crate::map_builders::voronoi_spawning::VoronoiSpawning;
-
-pub trait InitialMapBuilder {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
-}
-
-pub trait MetaMapBuilder {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
-}
-
-pub struct BuilderChain {
-    starter: Option<Box<dyn InitialMapBuilder>>,
-    builders: Vec<Box<dyn MetaMapBuilder>>,
-    pub build_data : BuilderMap
-}
 
 pub struct BuilderMap {
     pub spawn_list : Vec<(usize, String)>,
@@ -92,6 +79,12 @@ impl BuilderMap {
             self.history.push(snapshot);
         }
     }
+}
+
+pub struct BuilderChain {
+    starter: Option<Box<dyn InitialMapBuilder>>,
+    builders: Vec<Box<dyn MetaMapBuilder>>,
+    pub build_data : BuilderMap
 }
 
 impl BuilderChain {
@@ -123,9 +116,7 @@ impl BuilderChain {
 
     pub fn build_map(&mut self, rng : &mut rltk::RandomNumberGenerator) {
         match &mut self.starter {
-            None =>
-                // Don't crash when using release build
-                debug_assert! { panic!("Cannot run a map builder chain without a starting build system @map_builders/mod.rs")},
+            None => panic!("Cannot run a map builder chain without a starting build system"),
             Some(starter) => {
                 // Build the starting map
                 starter.build_map(rng, &mut self.build_data);
@@ -143,6 +134,14 @@ impl BuilderChain {
             spawner::spawn_entity(ecs, &(&entity.0, &entity.1));
         }
     }
+}
+
+pub trait InitialMapBuilder {
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
+}
+
+pub trait MetaMapBuilder {
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
 }
 
 fn random_start_position(rng: &mut rltk::RandomNumberGenerator) -> (XStart, YStart) {
@@ -187,10 +186,17 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bui
 
         builder.with(RoomDrawer::new());
 
-        let corridor_roll = rng.roll_dice(1, 2);
+        let corridor_roll = rng.roll_dice(1, 4);
         match corridor_roll {
             1 => builder.with(DoglegCorridors::new()),
+            2 => builder.with(NearestCorridors::new()),
+            3 => builder.with(StraightLineCorridors::new()),
             _ => builder.with(BspCorridors::new())
+        }
+
+        let cspawn_roll = rng.roll_dice(1, 2);
+        if cspawn_roll == 1 {
+            builder.with(CorridorSpawner::new());
         }
 
         let modifier_roll = rng.roll_dice(1, 6);
@@ -224,7 +230,7 @@ fn random_room_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bui
 }
 
 fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut BuilderChain) {
-    let builder_roll = rng.roll_dice(1, 14);
+    let builder_roll = rng.roll_dice(1, 16);
     match builder_roll {
         1 => builder.start_with(CellularAutomataBuilder::new()),
         2 => builder.start_with(DrunkardsWalkBuilder::open_area()),
@@ -255,7 +261,6 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bu
     builder.with(DistantExit::new());
 }
 
-
 pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> BuilderChain {
     let mut builder = BuilderChain::new(new_depth);
     let type_roll = rng.roll_dice(1, 2);
@@ -266,13 +271,25 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator) -> 
 
     if rng.roll_dice(1, 3)==1 {
         builder.with(WaveformCollapseBuilder::new());
+
+        // Now set the start to a random starting area
+        let (start_x, start_y) = random_start_position(rng);
+        builder.with(AreaStartingPosition::new(start_x, start_y));
+
+        // Setup an exit and spawn mobs
+        builder.with(VoronoiSpawning::new());
+        builder.with(DistantExit::new());
     }
 
     if rng.roll_dice(1, 20)==1 {
         builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FORT));
     }
 
-    builder.with(PrefabBuilder::vaults());
+    builder.with(DoorPlacement::new());
+    
+    if rng.roll_dice(1,2)==1 {
+        builder.with(PrefabBuilder::vaults());
+    }
 
     builder
 }

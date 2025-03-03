@@ -4,7 +4,7 @@ use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use specs::shred::Fetch;
 use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, MAPHEIGHT, TileType};
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, MAPHEIGHT, TileType, BlocksVisibility, Door};
 use crate::Map;
 
 /// Spawns the player and returns its entity object.
@@ -260,7 +260,7 @@ fn ambrosia(ecs: &mut World, x: i32, y: i32) {
     ecs.create_entity()
         .with(Position{ x, y })
         .with(Renderable{
-            glyph: rltk::to_cp437('+'),
+            glyph: rltk::to_cp437('a'),
             fg: RGB::named(rltk::YELLOWGREEN),
             bg: RGB::named(rltk::BLACK),
             render_order: 2
@@ -319,6 +319,9 @@ fn door(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Door".to_string() })
+        .with(BlocksTile{})
+        .with(BlocksVisibility{})
+        .with(Door{open: false})
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 }

@@ -47,7 +47,7 @@ pub fn save_game(ecs : &mut World) {
             AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
             WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleePowerBonus, DefenseBonus,
             WantsToRemoveItem, HungerClock, ProvidesFood, MagicMapper, Hidden, EntryTrigger, EntityMoved,
-            SingleActivation
+            SingleActivation, BlocksVisibility, Door
         );
     }
 
@@ -99,7 +99,7 @@ pub fn load_game(ecs: &mut World) {
             AreaOfEffect, Confusion, ProvidesHealing, InBackpack, WantsToPickupItem, WantsToUseItem,
             WantsToDropItem, SerializationHelper, Equippable, Equipped, MeleePowerBonus, DefenseBonus,
                 WantsToRemoveItem, HungerClock, ProvidesFood, MagicMapper, Hidden, EntryTrigger, EntityMoved,
-                SingleActivation
+                SingleActivation, BlocksVisibility, Door
             );
         }
 

@@ -2,8 +2,8 @@ Inventory having too many items leads to overflow via going above the amount of 
 
 Repeatedly using Confusion Scroll on enemies can negate(?) status effect
 
-You can apply statuses to items by targeting them on the ground when using a status scroll
+You can apply statuses to items by targeting them on the ground when using a status scroll (keep this and enhance this into a mechanic?)
 
 When there is no save, Load Game is hidden (good) but is still selectable
 
-!BspInterior can generate entities in walls
+If there is an entity overlapping an item, the descriptor when hovering mouse on it is missing first char on entity name

@@ -110,6 +110,14 @@ impl PrefabBuilder {
                 build_data.map.tiles[idx] = TileType::Floor;
                 build_data.spawn_list.push((idx, "Health Potion".to_string()));
             }
+            'a' => {
+                build_data.map.tiles[idx] = TileType::Floor;
+                build_data.spawn_list.push((idx, "Ambrosia".to_string()));
+            }
+            '+' => {
+                build_data.map.tiles[idx] = TileType::Floor;
+                build_data.spawn_list.push((idx, "Door".to_string()));
+            }
             _ => {
                 rltk::console::log(format!("Unknown glyph loading map: {}", (ch as u8) as char));
             }
@@ -218,7 +226,7 @@ impl PrefabBuilder {
         if vault_roll < 4 { return; }
 
         // Note that this is a place-holder and will be moved out of this function
-        let master_vault_list = vec![TOTALLY_NOT_A_TRAP, CHECKERBOARD, SILLY_SMILE];
+        let master_vault_list = vec![TOTALLY_NOT_A_TRAP, CHECKERBOARD, SILLY_SMILE, HOLY_CROSS];
 
         // Filter the vault list down to ones that are applicable to the current depth
         let mut possible_vaults : Vec<&PrefabRoom> = master_vault_list
