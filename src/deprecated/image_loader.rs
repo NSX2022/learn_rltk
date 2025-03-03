@@ -1,7 +1,7 @@
 use rltk::rex::XpFile;
 use super::{Map, TileType};
 
-/// Loads a RexPaint file, and converts it into our map format
+/// Loads a RexPaint file, and converts it into map format
 pub fn load_rex_map(new_depth: i32, xp_file : &XpFile) -> Map {
     let mut map : Map = Map::new(new_depth);
 
@@ -12,7 +12,7 @@ pub fn load_rex_map(new_depth: i32, xp_file : &XpFile) -> Map {
                 if x < map.width as usize && y < map.height as usize {
                     let idx = map.xy_idx(x as i32, y as i32);
                     match cell.ch {
-                        32 => map.tiles[idx] = TileType::Floor, // #
+                        32 => map.tiles[idx] = TileType::Floor, // .
                         35 => map.tiles[idx] = TileType::Wall, // #
                         _ => {}
                     }
