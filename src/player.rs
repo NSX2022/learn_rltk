@@ -63,9 +63,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         }
 
         if !map.blocked[destination_idx] {
-            pos.x = min(79 , max(0, pos.x + delta_x));
-            pos.y = min(49, max(0, pos.y + delta_y));
-            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
+            pos.x = min(map.width-1 , max(0, pos.x + delta_x));
+            pos.y = min(map.height-1, max(0, pos.y + delta_y));
+            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker @player.rs");
 
             viewshed.dirty = true;
             let mut ppos = ecs.write_resource::<Point>();
@@ -75,6 +75,9 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     }
 }
 
+pub fn player_interact(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    //TODO
+}
 
 fn get_item(ecs: &mut World) {
     let player_pos = ecs.fetch::<Point>();

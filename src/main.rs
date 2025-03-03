@@ -33,7 +33,7 @@ pub mod hunger_system;
 pub mod rex_assets;
 pub mod trigger_system;
 pub mod map_builders;
-
+mod camera;
 
 //For testing
 const SHOW_MAPGEN_VISUALIZER : bool = true;
@@ -110,18 +110,7 @@ impl GameState for State {
             RunState::MainMenu{..} => {}
             RunState::GameOver{..} => {}
             _ => {
-                draw_map(&self.ecs.fetch::<Map>(), ctx);
-                let positions = self.ecs.read_storage::<Position>();
-                let renderables = self.ecs.read_storage::<Renderable>();
-                let hidden = self.ecs.read_storage::<Hidden>();
-                let map = self.ecs.fetch::<Map>();
-
-                let mut data = (&positions, &renderables, !&hidden).join().collect::<Vec<_>>();
-                data.sort_by(|&a, &b| b.1.render_order.cmp(&a.1.render_order) );
-                for (pos, render, _hidden) in data.iter() {
-                    let idx = map.xy_idx(pos.x, pos.y);
-                    if map.visible_tiles[idx] { ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph) }
-                }
+                camera::render_camera(&self.ecs, ctx);
                 gui::draw_ui(&self.ecs, ctx);
             }
         }
@@ -242,11 +231,11 @@ impl GameState for State {
             }
             RunState::MagicMapReveal{row} => {
                 let mut map = self.ecs.fetch_mut::<Map>();
-                for x in 0..MAPWIDTH {
+                for x in 0..map.width {
                     let idx = map.xy_idx(x as i32,row);
                     map.revealed_tiles[idx] = true;
                 }
-                if row as usize == MAPHEIGHT-1 {
+                if row == map.height-1 {
                     newrunstate = RunState::MonsterTurn;
                 } else {
                     newrunstate = RunState::MagicMapReveal{ row: row+1 };
@@ -257,25 +246,16 @@ impl GameState for State {
                     newrunstate = self.mapgen_next_state.unwrap();
                 } else {
                     ctx.cls();
+                    if self.mapgen_index < self.mapgen_history.len() { camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx); }
 
-                    // Ensure mapgen_index is within bounds before accessing mapgen_history
-                    if self.mapgen_index < self.mapgen_history.len() {
-                        draw_map(&self.mapgen_history[self.mapgen_index], ctx);
-
-                        self.mapgen_timer += ctx.frame_time_ms;
-                        if self.mapgen_timer > 150.0 {
-                            self.mapgen_timer = 0.0;
-                            self.mapgen_index += 1;
-
-                            // Transition to the next state if we've reached the end of the history
-                            if self.mapgen_index >= self.mapgen_history.len() {
-                                newrunstate = self.mapgen_next_state.unwrap();
-                            }
+                    self.mapgen_timer += ctx.frame_time_ms;
+                    if self.mapgen_timer > 200.0 {
+                        self.mapgen_timer = 0.0;
+                        self.mapgen_index += 1;
+                        if self.mapgen_index >= self.mapgen_history.len() {
+                            //self.mapgen_index -= 1;
+                            newrunstate = self.mapgen_next_state.unwrap();
                         }
-                    } else {
-                        // If mapgen_index is out of bounds, transition to the next state
-                        eprintln!("Index {} out of bounds for len {} at RunState::MapGeneration in main.rs", self.mapgen_index, self.mapgen_history.len());
-                        newrunstate = self.mapgen_next_state.unwrap();
                     }
                 }
             }
@@ -334,7 +314,7 @@ impl State {
         // Delete entities that aren't the player or his/her equipment
         let to_delete = self.entities_to_remove_on_level_change();
         for target in to_delete {
-            self.ecs.delete_entity(target).expect("Unable to delete entity");
+            self.ecs.delete_entity(target).expect("Unable to delete entity @main.rs");
         }
 
         // Build a new map and place the player
@@ -385,7 +365,8 @@ impl State {
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        let mut builder = map_builders::random_builder(new_depth, &mut rng);
+        //CONTROLS MAP SIZE
+        let mut builder = map_builders::random_builder(new_depth, &mut rng, 47,47);
         builder.build_map(&mut rng);
         std::mem::drop(rng);
         self.mapgen_history = builder.build_data.history.clone();
@@ -478,7 +459,7 @@ fn main() -> rltk::BError {
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
 
-    gs.ecs.insert(Map::new(1));
+    gs.ecs.insert(Map::new(1, 128, 128));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);

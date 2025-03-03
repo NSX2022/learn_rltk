@@ -3,10 +3,6 @@ use specs::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashSet;
 
-pub const MAPWIDTH : usize = 80;
-pub const MAPHEIGHT : usize = 43;
-pub const MAPCOUNT : usize = MAPHEIGHT * MAPWIDTH;
-
 #[derive(PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize)]
 pub enum TileType {
     Wall, Floor, DownStairs
@@ -53,15 +49,18 @@ impl Map {
     }
 
     /// Generates an empty map, consisting entirely of solid walls
-    pub fn new(new_depth : i32) -> Map {
+    /// Generates an empty map, consisting entirely of solid walls
+
+    pub fn new(new_depth : i32, width: i32, height: i32) -> Map {
+        let map_tile_count = (width*height) as usize;
         Map{
-            tiles : vec![TileType::Wall; MAPCOUNT],
-            width : MAPWIDTH as i32,
-            height: MAPHEIGHT as i32,
-            revealed_tiles : vec![false; MAPCOUNT],
-            visible_tiles : vec![false; MAPCOUNT],
-            blocked : vec![false; MAPCOUNT],
-            tile_content : vec![Vec::new(); MAPCOUNT],
+            tiles : vec![TileType::Wall; map_tile_count],
+            width,
+            height,
+            revealed_tiles : vec![false; map_tile_count],
+            visible_tiles : vec![false; map_tile_count],
+            blocked : vec![false; map_tile_count],
+            tile_content : vec![Vec::new(); map_tile_count],
             depth: new_depth,
             bloodstains: HashSet::new(),
             view_blocked : HashSet::new()
@@ -177,9 +176,9 @@ pub fn draw_map(map : &Map, ctx : &mut Rltk) {
             ctx.set(x, y, fg, bg, glyph);
         }
 
-        // Move the coordinates
+        // Move coordinates
         x += 1;
-        if x > MAPWIDTH as i32-1 {
+        if x > (map.width * map.height) as i32-1 {
             x = 0;
             y += 1;
         }

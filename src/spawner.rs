@@ -4,7 +4,7 @@ use specs::prelude::*;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use specs::shred::Fetch;
 use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, map::MAPWIDTH, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, MAPHEIGHT, TileType, BlocksVisibility, Door};
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, TileType, BlocksVisibility, Door};
 use crate::Map;
 
 /// Spawns the player and returns its entity object.
@@ -47,17 +47,6 @@ pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, map_
     }
 
     spawn_region(map, rng, &possible_targets, map_depth, spawn_list);
-}
-
-/// Checks if a tile is valid for spawning
-fn is_tile_valid_for_spawning(tiles: &[TileType], blocked: &[bool], idx: usize) -> bool {
-    // Ensure the tile is within map bounds
-    if idx >= MAPWIDTH * MAPHEIGHT {
-        return false;
-    }
-
-    // Check if the tile is a floor and not blocked
-    tiles[idx] == TileType::Floor && !blocked[idx]
 }
 
 fn orc(ecs: &mut World, x: i32, y: i32) { monster(ecs, x, y, rltk::to_cp437('o'), "Orc"); }
@@ -373,8 +362,11 @@ pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize],
 
 /// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
 pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
-    let x = (*spawn.0 % MAPWIDTH) as i32;
-    let y = (*spawn.0 / MAPWIDTH) as i32;
+    let map = ecs.fetch::<Map>();
+    let width = map.width as usize;
+    let x = (*spawn.0 % width) as i32;
+    let y = (*spawn.0 / width) as i32;
+    std::mem::drop(map);
 
     match spawn.1.as_ref() {
         "Goblin" => goblin(ecs, x, y),
