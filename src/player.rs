@@ -49,11 +49,13 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
                         viewshed.dirty = true;
                     }
                     true => {
+                        /*
                         door.open = false;
                         blocks_visibility.insert(*potential_target, BlocksVisibility {}).expect("Couldn't add closing Door to blocks_visibility @player.rs");
                         blocks_movement.insert(*potential_target, BlocksTile{}).expect("Couldn't add closing Door to blocks_movement @player.rs");
                         glyph.glyph = rltk::to_cp437('+');
                         viewshed.dirty = true;
+                         */
                     }
                     _ => {
                         panic!("Door in unknown state @player.rs")

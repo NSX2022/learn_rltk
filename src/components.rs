@@ -19,17 +19,7 @@ pub struct Renderable {
     pub render_order : i32
 }
 
-
-#[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
-pub enum HungerState { WellFed, Normal, Hungry, Starving }
-
-#[derive(Component, Serialize, Deserialize, Clone)]
-pub struct HungerClock {
-    pub state : HungerState,
-    pub duration : i32
-}
-
-#[derive(Component, Serialize, Deserialize, Clone)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Player {}
 
 #[derive(Component, ConvertSaveload, Clone)]
@@ -110,28 +100,40 @@ pub struct ProvidesHealing {
     pub heal_amount : i32
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct BlocksVisibility {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Door {
+    pub open: bool
+}
+
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct InBackpack {
     pub owner : Entity
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToPickupItem {
     pub collected_by : Entity,
     pub item : Entity
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToUseItem {
     pub item : Entity,
     pub target : Option<rltk::Point>
 }
 
-#[derive(Component, Debug, ConvertSaveload)]
+#[derive(Component, Debug, ConvertSaveload, Clone)]
 pub struct WantsToDropItem {
     pub item : Entity
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantsToRemoveItem {
+    pub item : Entity
+}
 
 #[derive(PartialEq, Copy, Clone, Serialize, Deserialize)]
 pub enum EquipmentSlot { Melee, Shield }
@@ -140,7 +142,6 @@ pub enum EquipmentSlot { Melee, Shield }
 pub struct Equippable {
     pub slot : EquipmentSlot
 }
-
 
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Equipped {
@@ -158,26 +159,18 @@ pub struct DefenseBonus {
     pub defense : i32
 }
 
-
-#[derive(Component, Debug, ConvertSaveload, Clone)]
-pub struct WantsToRemoveItem {
-    pub item : Entity
-}
-
 #[derive(Component, Serialize, Deserialize, Clone)]
 pub struct ParticleLifetime {
     pub lifetime_ms : f32
 }
 
-// Serialization helper code. We need to implement ConvertSaveload for each type that contains an
-// Entity.
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
+pub enum HungerState { WellFed, Normal, Hungry, Starving }
 
-pub struct SerializeMe;
-
-// Special component that exists to help serialize the game data
 #[derive(Component, Serialize, Deserialize, Clone)]
-pub struct SerializationHelper {
-    pub map : super::map::Map
+pub struct HungerClock {
+    pub state : HungerState,
+    pub duration : i32
 }
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
@@ -198,10 +191,13 @@ pub struct EntityMoved {}
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct SingleActivation {}
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct BlocksVisibility {}
+// Serialization helper code. We need to implement ConvertSaveLoad for each type that contains an
+// Entity.
 
-#[derive(Component, Debug, Serialize, Deserialize, Clone)]
-pub struct Door {
-    pub open: bool
+pub struct SerializeMe;
+
+// Special component that exists to help serialize the game data
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct SerializationHelper {
+    pub map : super::map::Map
 }

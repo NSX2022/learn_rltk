@@ -1855,6 +1855,7 @@ dependencies = [
 name = "tradrogueliketutorial"
 version = "0.1.0"
 dependencies = [
+ "lazy_static",
  "rltk",
  "serde",
  "serde_json",

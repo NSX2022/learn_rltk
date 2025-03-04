@@ -6,6 +6,9 @@ use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 mod components;
 pub use components::*;
 mod map;
+
+#[path = "mods/directories.rs"] mod directories;
+
 pub use map::*;
 mod player;
 use player::*;
@@ -26,6 +29,8 @@ mod gamelog;
 mod spawner;
 mod inventory_system;
 use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem, ItemRemoveSystem };
+use crate::directories::initialize;
+
 pub mod saveload_system;
 pub mod random_table;
 pub mod particle_system;
@@ -34,8 +39,10 @@ pub mod rex_assets;
 pub mod trigger_system;
 pub mod map_builders;
 mod camera;
+mod raws;
 
 //For testing
+//TODO read from config file
 const SHOW_MAPGEN_VISUALIZER : bool = true;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -366,7 +373,7 @@ impl State {
         self.mapgen_history.clear();
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
         //CONTROLS MAP SIZE
-        let mut builder = map_builders::random_builder(new_depth, &mut rng, 47,47);
+        let mut builder = map_builders::random_builder(new_depth, &mut rng, 56,56);
         builder.build_map(&mut rng);
         std::mem::drop(rng);
         self.mapgen_history = builder.build_data.history.clone();
@@ -401,7 +408,14 @@ impl State {
     }
 }
 
+fn load_config_vals() {
+    //TODO
+}
+
 fn main() -> rltk::BError {
+    
+    initialize();
+    
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::simple80x50()
         .with_title("Learn RLTK")
@@ -458,6 +472,9 @@ fn main() -> rltk::BError {
     gs.ecs.register::<BlocksVisibility>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
+    
+    //Load NON-MODDED raws before adding to World
+    raws::load_raws();
 
     gs.ecs.insert(Map::new(1, 128, 128));
     gs.ecs.insert(Point::new(0, 0));

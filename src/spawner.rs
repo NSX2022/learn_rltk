@@ -6,6 +6,7 @@ use specs::shred::Fetch;
 use crate::random_table::RandomTable;
 use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, TileType, BlocksVisibility, Door};
 use crate::Map;
+use crate::raws::{spawn_named_item, SpawnType, RAWS};
 
 /// Spawns the player and returns its entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -80,7 +81,7 @@ fn health_potion(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Health Potion".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Consumable{})
         .with(ProvidesHealing{ heal_amount: 8 })
         .marked::<SimpleMarker<SerializeMe>>()
@@ -97,7 +98,7 @@ fn magic_missile_scroll(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Magic Missile Scroll".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Consumable{})
         .with(Ranged{ range: 6 })
         .with(InflictsDamage{ damage: 20 })
@@ -115,7 +116,7 @@ fn dart(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Dart".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Consumable{})
         .with(Ranged{ range: 24 })
         .with(InflictsDamage{ damage: 12 })
@@ -133,7 +134,7 @@ fn fireball_scroll(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Fireball Scroll".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Consumable{})
         .with(Ranged{ range: 6 })
         .with(InflictsDamage{ damage: 20 })
@@ -152,7 +153,7 @@ fn confusion_scroll(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Confusion Scroll".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Consumable{})
         .with(Ranged{ range: 5 })
         .with(Confusion{ turns: 6 })
@@ -170,7 +171,7 @@ fn dagger(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Dagger".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Equippable{ slot: EquipmentSlot::Melee })
         .with(MeleePowerBonus{ power: 2 })
         .marked::<SimpleMarker<SerializeMe>>()
@@ -187,7 +188,7 @@ fn shield(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Shield".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Equippable{ slot: EquipmentSlot::Shield })
         .with(DefenseBonus{ defense: 1 })
         .marked::<SimpleMarker<SerializeMe>>()
@@ -204,7 +205,7 @@ fn longsword(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Longsword".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Equippable{ slot: EquipmentSlot::Melee })
         .with(MeleePowerBonus{ power: 4 })
         .marked::<SimpleMarker<SerializeMe>>()
@@ -221,7 +222,7 @@ fn tower_shield(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Tower Shield".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(Equippable{ slot: EquipmentSlot::Shield })
         .with(DefenseBonus{ defense: 3 })
         .marked::<SimpleMarker<SerializeMe>>()
@@ -238,7 +239,7 @@ fn rations(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Rations".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(ProvidesFood{})
         .with(Consumable{})
         .marked::<SimpleMarker<SerializeMe>>()
@@ -255,7 +256,7 @@ fn ambrosia(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Ambrosia".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(ProvidesFood{})
         .with(ProvidesHealing{ heal_amount: 6})
         .with(Consumable{})
@@ -273,7 +274,7 @@ fn magic_mapping_scroll(ecs: &mut World, x: i32, y: i32) {
             render_order: 2
         })
         .with(Name{ name : "Divination Scroll".to_string() })
-        .with(Item{})
+        .with(Item {})
         .with(MagicMapper{})
         .with(Consumable{})
         .marked::<SimpleMarker<SerializeMe>>()
@@ -367,6 +368,11 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let x = (*spawn.0 % width) as i32;
     let y = (*spawn.0 / width) as i32;
     std::mem::drop(map);
+
+    let item_result = spawn_named_item(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
+    if item_result.is_some() {
+        return;
+    }
 
     match spawn.1.as_ref() {
         "Goblin" => goblin(ecs, x, y),

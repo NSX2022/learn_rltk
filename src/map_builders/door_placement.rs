@@ -54,7 +54,7 @@ impl DoorPlacement {
             let halls = halls_original.clone(); // To avoid nested borrowing
             for hall in halls.iter() {
                 if hall.len() > 2 { // We aren't interested in tiny corridors
-                    if self.door_possible(build_data, hall[0]) {
+                    if self.door_possible(build_data, hall[0]) && rng.roll_dice(1,2)==1 {
                         build_data.spawn_list.push((hall[0], "Door".to_string()));
                     }
                 }

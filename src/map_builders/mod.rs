@@ -273,20 +273,23 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         _ => random_shape_builder(rng, &mut builder)
     }
 
-    if rng.roll_dice(1, 3)==1 {
+    if rng.roll_dice(1, 4)==1 {
         builder.with(WaveformCollapseBuilder::new());
 
         // Now set the start to a random starting area
         let (start_x, start_y) = random_start_position(rng);
         builder.with(AreaStartingPosition::new(start_x, start_y));
 
-        // Setup an exit and spawn mobs
+        // spawn mobs
         builder.with(VoronoiSpawning::new());
-        builder.with(DistantExit::new());
     }
 
-    if rng.roll_dice(1, 20)==1 {
+    if rng.roll_dice(1, 30)==1 {
         builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FORT));
+    }
+    
+    if rng.roll_dice(1, 45) == 1{
+        builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FOUNTAIN));
     }
 
     builder.with(DoorPlacement::new());
@@ -294,6 +297,12 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     if rng.roll_dice(1,2)==1 {
         builder.with(PrefabBuilder::vaults());
     }
+    
+    builder.with(CullUnreachable::new());
+    
+    //place stairs last
+    //TODO check if stairs already exist
+    builder.with(DistantExit::new());
 
     builder
 }
