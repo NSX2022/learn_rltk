@@ -9,5 +9,5 @@ pub struct RawMod {
     //std::str::from_utf8 for loading the .json file
     pub data: String,
     //optional priority to set load order, lower numbers priority, 0 is highest priority
-    priority: Option<i32>
+    pub priority: Option<i32>
 }
