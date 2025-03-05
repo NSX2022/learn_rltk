@@ -7,3 +7,7 @@ You can apply statuses to items by targeting them on the ground when using a sta
 When there is no save, Load Game is hidden (good) but is still selectable
 
 If there is an entity overlapping an item, the descriptor when hovering mouse on it is missing first char on entity name
+
+WHEN CREATING SOMETHING IN RAWs ALWAYS PUT IT IN THE CORRECT CATEGORY (e.g, items[], monsters[])
+
+Convert saving and loading to binary

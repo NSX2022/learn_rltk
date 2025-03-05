@@ -1,9 +1,28 @@
 {
+  "spawn_table" : [
+    { "name" : "Goblin", "weight" : 10, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Orc", "weight" : 1, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+    { "name" : "Health Potion", "weight" : 7, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Fireball Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+    { "name" : "Confusion Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+    { "name" : "Magic Missile Scroll", "weight" : 4, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Dart", "weight" : 4, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Ambrosia", "weight" : 4, "min_depth" : 5, "max_depth" : 100 },
+    { "name" : "Dagger", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Longsword", "weight" : 1, "min_depth" : 1, "max_depth" : 100 },
+    { "name" : "Tower Shield", "weight" : 1, "min_depth" : 1, "max_depth" : 100 },
+    { "name" : "Rations", "weight" : 10, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Divination Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Bear Trap", "weight" : 5, "min_depth" : 0, "max_depth" : 100 },
+    { "name" : "Battleaxe", "weight" : 1, "min_depth" : 2, "max_depth" : 100 },
+    { "name" : "Kobold", "weight" : 15, "min_depth" : 0, "max_depth" : 3 }
+  ],
   "items" : [
     {
       "name" : "Health Potion",
       "renderable": {
-        "glyph" : "!",
+        "glyph" : "i",
         "fg" : "#FF00FF",
         "bg" : "#000000",
         "order" : 2
@@ -28,7 +47,36 @@
         }
       }
     },
-
+    {
+      "name" : "Dart",
+      "renderable": {
+        "glyph" : "-",
+        "fg" : "#9B9B9B",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "consumable" : {
+        "effects" : {
+          "ranged" : "24",
+          "damage" : "12"
+        }
+      }
+    },
+    {
+      "name" : "Ambrosia",
+      "renderable": {
+        "glyph" : "a",
+        "fg" : "#9B9B9B",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "consumable" : {
+        "effects" : {
+          "food" : "",
+          "provides_healing" : "6"
+        }
+      }
+    },
     {
       "name" : "Fireball Scroll",
       "renderable": {
@@ -110,7 +158,7 @@
     {
       "name" : "Longsword",
       "renderable": {
-        "glyph" : "/",
+        "glyph" : "|",
         "fg" : "#FFAAFF",
         "bg" : "#000000",
         "order" : 2
@@ -124,7 +172,7 @@
     {
       "name" : "Shield",
       "renderable": {
-        "glyph" : "[",
+        "glyph" : "0",
         "fg" : "#00AAFF",
         "bg" : "#000000",
         "order" : 2
@@ -147,7 +195,6 @@
       }
     }
   ],
-
   "mobs" : [
     {
       "name" : "Orc",
@@ -185,7 +232,6 @@
       "vision_range" : 8
     }
   ],
-
   "props" : [
     {
       "name" : "Clamp Trap",
@@ -203,39 +249,6 @@
         }
       }
     },
-    
-    {
-      "name" : "Dart",
-      "renderable": {
-        "glyph" : "-",
-        "fg" : "#9B9B9B",
-        "bg" : "#000000",
-        "order" : 2
-      },
-      "consumable" : {
-        "effects" : {
-          "ranged" : "16",
-          "damage" : "14"
-        }
-      }
-    },
-    
-    {
-      "name" : "Ambrosia",
-      "renderable": {
-        "glyph" : "a",
-        "fg" : "#9B9B9B",
-        "bg" : "#000000",
-        "order" : 2
-      },
-      "consumable" : {
-        "effects" : {
-          "food" : "",
-          "provides_healing" : "6"
-        }
-      }
-    },
-    
     {
       "name" : "Door",
       "renderable": {
@@ -247,7 +260,7 @@
       "hidden" : false,
       "blocks_tile" : true,
       "blocks_visibility" : true,
-      "door_open" : true
+      "door_open" : false
     }
   ]
 }

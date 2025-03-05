@@ -40,6 +40,7 @@ pub mod trigger_system;
 pub mod map_builders;
 mod camera;
 mod raws;
+mod mods;
 
 //For testing
 //TODO read from config file

@@ -17,10 +17,10 @@ pub struct RawMaster {
 impl RawMaster {
     pub fn empty() -> RawMaster {
         RawMaster {
-            raws : Raws{ items: Vec::new(), mobs: Vec::new(), props: Vec::new() },
+            raws : Raws{ items: Vec::new(), mobs: Vec::new(), props: Vec::new(), spawn_table: Vec::new() },
             item_index : HashMap::new(),
             mob_index : HashMap::new(),
-            prop_index : HashMap::new()
+            prop_index : HashMap::new(),
         }
     }
 
@@ -194,6 +194,8 @@ pub fn spawn_named_prop(raws: &RawMaster, new_entity : EntityBuilder, key : &str
 }
 
 pub fn spawn_named_entity(raws: &RawMaster, new_entity : EntityBuilder, key : &str, pos : SpawnType) -> Option<Entity> {
+    //EVERY ENTITY should be in this list!!!
+    eprintln!("{}", key);
     if raws.item_index.contains_key(key) {
         return spawn_named_item(raws, new_entity, key, pos);
     } else if raws.mob_index.contains_key(key) {
