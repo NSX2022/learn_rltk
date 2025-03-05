@@ -31,7 +31,6 @@
         "effects" : { "provides_healing" : "8" }
       }
     },
-
     {
       "name" : "Magic Missile Scroll",
       "renderable": {
@@ -51,7 +50,7 @@
       "name" : "Dart",
       "renderable": {
         "glyph" : "-",
-        "fg" : "#9B9B9B",
+        "fg" : "#BFBFBF",
         "bg" : "#000000",
         "order" : 2
       },
@@ -66,7 +65,7 @@
       "name" : "Ambrosia",
       "renderable": {
         "glyph" : "a",
-        "fg" : "#9B9B9B",
+        "fg" : "#0FB649",
         "bg" : "#000000",
         "order" : 2
       },
@@ -93,7 +92,6 @@
         }
       }
     },
-
     {
       "name" : "Confusion Scroll",
       "renderable": {
@@ -110,7 +108,6 @@
         }
       }
     },
-
     {
       "name" : "Divination Scroll",
       "renderable": {
@@ -125,7 +122,6 @@
         }
       }
     },
-
     {
       "name" : "Rations",
       "renderable": {
@@ -140,12 +136,11 @@
         }
       }
     },
-
     {
       "name" : "Dagger",
       "renderable": {
         "glyph" : "/",
-        "fg" : "#FFAAAA",
+        "fg" : "#EAEAEA",
         "bg" : "#000000",
         "order" : 2
       },
@@ -154,12 +149,11 @@
         "power_bonus" : 2
       }
     },
-
     {
       "name" : "Longsword",
       "renderable": {
         "glyph" : "|",
-        "fg" : "#FFAAFF",
+        "fg" : "#FCFE46",
         "bg" : "#000000",
         "order" : 2
       },
@@ -168,12 +162,24 @@
         "power_bonus" : 4
       }
     },
-
+    {
+      "name" : "Battleaxe",
+      "renderable": {
+        "glyph" : "¶",
+        "fg" : "#FF55FF",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "weapon" : {
+        "range" : "melee",
+        "power_bonus" : 5
+      }
+    },
     {
       "name" : "Shield",
       "renderable": {
         "glyph" : "0",
-        "fg" : "#00AAFF",
+        "fg" : "#EAEAEA",
         "bg" : "#000000",
         "order" : 2
       },
@@ -181,12 +187,11 @@
         "defense_bonus" : 1
       }
     },
-
     {
       "name" : "Tower Shield",
       "renderable": {
         "glyph" : "[",
-        "fg" : "#00FFFF",
+        "fg" : "#FCFE46",
         "bg" : "#000000",
         "order" : 2
       },
@@ -213,7 +218,6 @@
       },
       "vision_range" : 8
     },
-
     {
       "name" : "Goblin",
       "renderable": {
@@ -230,6 +234,23 @@
         "power" : 3
       },
       "vision_range" : 8
+    },
+    {
+      "name" : "Kobold",
+      "renderable": {
+        "glyph" : "k",
+        "fg" : "#FF0000",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 4,
+        "hp" : 4,
+        "defense" : 0,
+        "power" : 2
+      },
+      "vision_range" : 4
     }
   ],
   "props" : [

@@ -7,6 +7,7 @@ use crate::random_table::RandomTable;
 use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, TileType, BlocksVisibility, Door};
 use crate::Map;
 use crate::raws::{spawn_named_entity, spawn_named_item, SpawnType, RAWS};
+use crate::raws::{get_spawn_table_for_depth};
 
 /// Spawns the player and returns its entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -50,24 +51,9 @@ pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, map_
     spawn_region(map, rng, &possible_targets, map_depth, spawn_list);
 }
 
+
 fn room_table(map_depth: i32) -> RandomTable {
-    //TODO Load modded entities? Get further in RAW file development instead and load from there?
-    RandomTable::new()
-        .add("Goblin", 15)
-        .add("Orc", 0 + map_depth)
-        .add("Health Potion", 4)
-        .add("Fireball Scroll", i32::min(map_depth, 10))
-        .add("Confusion Scroll", i32::min(1 + map_depth, 12))
-        .add("Magic Missile Scroll", 2)
-        .add("Dart", 4)
-        .add("Dagger", 2)
-        .add("Shield", 2)
-        .add("Longsword", i32::min(map_depth, 6) - 2)
-        .add("Tower Shield", i32::min(map_depth, 6) - 2)
-        .add("Rations", 8)
-        .add("Ambrosia", i32::min(map_depth, 25) - 15)
-        .add("Divination Scroll", 2)
-        .add("Clamp Trap", i32::min(map_depth, 6) - 4)
+    get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth)
 }
 
 /// Fills a region with stuff!
@@ -96,7 +82,6 @@ pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize],
     }
 }
 
-/// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
 /// Spawns a named entity (name in tuple.1) at the location in (tuple.0)
 pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let map = ecs.fetch::<Map>();

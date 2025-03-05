@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use specs::prelude::*;
 use crate::components::*;
+use crate::random_table::RandomTable;
 use super::{Raws};
 
 pub enum SpawnType {
@@ -27,14 +28,33 @@ impl RawMaster {
     pub fn load(&mut self, raws : Raws) {
         self.raws = raws;
         self.item_index = HashMap::new();
+        let mut used_names : HashSet<String> = HashSet::new();
         for (i,item) in self.raws.items.iter().enumerate() {
+            if used_names.contains(&item.name) {
+                rltk::console::log(format!("WARNING -  duplicate item name in raws [{}]", item.name));
+            }
             self.item_index.insert(item.name.clone(), i);
+            used_names.insert(item.name.clone());
         }
         for (i,mob) in self.raws.mobs.iter().enumerate() {
+            if used_names.contains(&mob.name) {
+                rltk::console::log(format!("WARNING -  duplicate mob name in raws [{}]", mob.name));
+            }
             self.mob_index.insert(mob.name.clone(), i);
+            used_names.insert(mob.name.clone());
         }
         for (i,prop) in self.raws.props.iter().enumerate() {
+            if used_names.contains(&prop.name) {
+                rltk::console::log(format!("WARNING -  duplicate prop name in raws [{}]", prop.name));
+            }
             self.prop_index.insert(prop.name.clone(), i);
+            used_names.insert(prop.name.clone());
+        }
+
+        for spawn in self.raws.spawn_table.iter() {
+            if !used_names.contains(&spawn.name) {
+                rltk::console::log(format!("WARNING - Spawn tables references unspecified entity {}", spawn.name));
+            }
         }
     }
 }
@@ -50,6 +70,26 @@ fn spawn_position(pos : SpawnType, new_entity : EntityBuilder) -> EntityBuilder 
     }
 
     eb
+}
+
+pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
+    use super::SpawnTableEntry;
+
+    let available_options : Vec<&SpawnTableEntry> = raws.raws.spawn_table
+        .iter()
+        .filter(|a| depth >= a.min_depth && depth <= a.max_depth)
+        .collect();
+
+    let mut rt = RandomTable::new();
+    for e in available_options.iter() {
+        let mut weight = e.weight;
+        if e.add_map_depth_to_weight.is_some() {
+            weight += depth;
+        }
+        rt = rt.add(e.name.clone(), weight);
+    }
+
+    rt
 }
 
 fn get_renderable_component(renderable : &super::item_structs::Renderable) -> crate::components::Renderable {

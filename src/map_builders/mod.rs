@@ -300,9 +300,11 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     
     builder.with(CullUnreachable::new());
     
+    //TODO reject map if less than 10% of tiles are floor
+    
     //place stairs last
     //TODO check if stairs already exist
-    builder.with(DistantExit::new());
+    //builder.with(DistantExit::new());
 
     builder
 }

@@ -89,7 +89,7 @@ pub fn render_debug_map(map : &Map, ctx : &mut Rltk) {
     for ty in min_y .. max_y {
         let mut x = 0;
         for tx in min_x .. max_x {
-            if tx > 0 && tx < map_width && ty > 0 && ty < map_height {
+            if tx > -1 && tx < map_width && ty > -1 && ty < map_height {
                 let idx = map.xy_idx(tx, ty);
                 if map.revealed_tiles[idx] {
                     let (glyph, fg, bg) = get_tile_glyph(idx, &*map);
