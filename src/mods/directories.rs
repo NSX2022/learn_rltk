@@ -1,6 +1,6 @@
 use std::fs;
 use std::fs::File;
-use std::io::Write; // Import the Write trait
+use std::io::Write;
 use std::path::{PathBuf};
 use std::env;
 
@@ -9,9 +9,10 @@ const MODS_DIR: &str = "mods";
 const CONFIG_DIR: &str = "config";
 const RAWS_DIR: &str = "raws";
 const INFO_DIR: &str = "info";
-const MODDED_ENTITIES_FILE: &str = "modded_entities.json";
+const LUA_DIR: &str = "lua";
+const MODDED_ENTITIES_FILE: &str = "example_mod.json";
 const README_FILE: &str = "README.txt";
-const CONFIG_FILE: &str = "config.json";
+const CONFIG_FILE: &str = "config.txt";
 
 pub fn initialize() -> Result<(), std::io::Error> {
     println!("Initializing directory creation");
@@ -26,19 +27,19 @@ pub fn initialize() -> Result<(), std::io::Error> {
     let config_dir = exe_dir.join(CONFIG_DIR);
     let mods_dir = exe_dir.join(MODS_DIR);
     let raws_dir = mods_dir.join(RAWS_DIR);
-    let info_dir = mods_dir.join(INFO_DIR);
-    let modded_entities_path = raws_dir.join(MODDED_ENTITIES_FILE);
-    let readme_path = info_dir.join(README_FILE);
+    let lua_dir = mods_dir.join(LUA_DIR);
+    let example_mod_path = raws_dir.join(MODDED_ENTITIES_FILE);
+    let readme_path = exe_dir.join(README_FILE);
     let config_file_path = config_dir.join(CONFIG_FILE);
 
     // Create directories
     fs::create_dir_all(&raws_dir)?;
-    fs::create_dir_all(&info_dir)?;
     fs::create_dir_all(&config_dir)?;
+    fs::create_dir_all(&lua_dir)?;
 
     // Create files if they don't exist
-    if !modded_entities_path.exists() {
-        File::create(&modded_entities_path)?;
+    if !example_mod_path.exists() {
+        File::create(&example_mod_path)?;
     }
 
     if !readme_path.exists() {
@@ -60,6 +61,8 @@ pub fn initialize() -> Result<(), std::io::Error> {
         writeln!(file, "For more advanced modding (e.g, writing a new UI or changing game systems), you need to use luau files")?;
         writeln!(file, "To use ANY mods, lua or otherwise, you must change LOAD_MODS to true in the config")?;
         writeln!(file)?;
+        writeln!(file, "!WARNING! example_mod.json will be restored every launch if you delete it. To disable this mod, delete all of its contents so it's not loaded")?;
+        writeln!(file)?;
         writeln!(file, "Syntax guide:")?;
         writeln!(file, "TODO")?;
         
@@ -68,27 +71,34 @@ pub fn initialize() -> Result<(), std::io::Error> {
         println!("README.txt already exists");
     }
 
-    // Write to config.json only if it's empty
+    // Write to config.txt only if it's empty
     let metadata = fs::metadata(&config_file_path)?;
+    /* check number of lines to ensure that config wasn't modified? 
+        eprinln!() an error in case lua mods add stuff to the config?
+     */
     if metadata.len() == 0 {
         let mut file = fs::OpenOptions::new()
             .write(true)
             .open(&config_file_path)?;
-        writeln!(file, "LOAD_MODS = false")?;
-        //TODO make Main use this
-        writeln!(file, "SHOW_MAP_VISUALIZER = false")?;
+        /*TODO make Main use this via calling read_config and using that function's Tuple return to use as settings 
+            DO THIS AFTER CALLING initialize() to ensure that config.txt exists
+            Skip lines in the config file that start with //
+         */
+        writeln!(file, "//all values with <RANGE = 0-1> are true or false, 1 = true and 0 = false")?;
+        writeln!(file, "//whether or not to load lua and json mods [DEFAULT = 0] <RANGE = 0-1>")?;
+        writeln!(file, "0")?;
+        writeln!(file, "//whether or not to show the map creation visualizer [DEFAULT = 0] <RANGE = 0-1>")?;
+        writeln!(file, "0")?;
+        //Ch 57 in the documentation or something
+        writeln!(file, "//whether or not to show FPS [DEFAULT = 0] <RANGE = 0-1>")?;
+        writeln!(file, "0")?;
+        //Add more for verbose logging and such
 
-        println!("config.json created");
+        println!("config.txt created");
     } else {
-        println!("config.json already exists")
+        println!("config.txt already exists")
     }
 
-    println!("Directories and files created successfully at: {:?}", exe_dir);
+    println!("Directories and files initialized successfully at: {:?}", exe_dir);
     Ok(())
-}
-
-fn main() {
-    if let Err(e) = initialize() {
-        eprintln!("Error during initialization: {}", e);
-    }
 }
