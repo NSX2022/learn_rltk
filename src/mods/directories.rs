@@ -3,6 +3,8 @@ use std::fs::File;
 use std::io::Write;
 use std::path::{PathBuf};
 use std::env;
+use std::ptr::write;
+use lazy_static::lazy_static;
 
 // Constants for directory and file names
 const MODS_DIR: &str = "mods";
@@ -46,7 +48,7 @@ pub fn initialize() -> Result<(), std::io::Error> {
         File::create(&readme_path)?;
     }
 
-    if !config_file_path.exists() {
+    if !config_exists() {
         File::create(&config_file_path)?;
     }
 
@@ -92,6 +94,18 @@ pub fn initialize() -> Result<(), std::io::Error> {
         //Ch 57 in the documentation or something
         writeln!(file, "//whether or not to show FPS [DEFAULT = 0] <RANGE = 0-1>")?;
         writeln!(file, "0")?;
+
+        writeln!(file, "//whether or not to use scanlines shader [DEFAULT = 1] <RANGE = 0-1>")?;
+        writeln!(file, "1")?;
+        writeln!(file, "//whether or not to use VSYNC [DEFAULT = 1] <RANGE = 0-1>")?;
+        writeln!(file, "1")?;
+        //Also Ch 57 I think
+        writeln!(file,"//SEVERE PERFORMANCE IMPACT")?;
+        writeln!(file,"//whether or not to use multithreading [DEFAULT = 1] <RANGE = 0-1>")?;
+        writeln!(file,"1")?;
+
+        writeln!(file,"//frame limit [DEFAULT = -1] <RANGE = -1-2^31>")?;
+        writeln!(file,"-1")?;
         //Add more for verbose logging and such
 
         println!("config.txt created");
@@ -101,4 +115,30 @@ pub fn initialize() -> Result<(), std::io::Error> {
 
     println!("Directories and files initialized successfully at: {:?}", exe_dir);
     Ok(())
+}
+
+// MUST BE UPDATED every time you add a new config option
+pub fn config_defaults() -> (bool,bool,bool,bool,bool,bool,f32) { 
+    (false,false,false,true,true,true,-1f32)
+}
+
+pub fn read_config() -> (bool,bool,bool,bool,bool,bool,f32) {
+    // PLACEHOLDER, has default values
+    let to_ret = config_defaults();
+    //TODO actually read config.txt, set to_ret to those values
+    
+    
+    to_ret
+}
+
+pub fn config_exists() -> bool {
+    let exe_dir = env::current_exe().expect("Failed to get path to executable directory")
+        .parent()
+        .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::Other, "Could not get executable directory")).expect("")
+        .to_path_buf();
+    
+    let config_dir = exe_dir.join(CONFIG_DIR);
+    let config_file_path = config_dir.join(CONFIG_FILE);
+    
+    config_file_path.exists()
 }

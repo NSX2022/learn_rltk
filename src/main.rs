@@ -29,7 +29,7 @@ mod gamelog;
 mod spawner;
 mod inventory_system;
 use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem, ItemRemoveSystem };
-use crate::directories::initialize;
+use crate::directories::{config_exists, initialize, read_config};
 
 pub mod saveload_system;
 pub mod random_table;
@@ -414,14 +414,23 @@ fn load_config_vals() {
 }
 
 fn main() -> rltk::BError {
+    //TODO use to construct BTerm window
+    let mut config_data = (false,false,false,true,true,true,-1f32);
+    if(config_exists()) {
+        config_data = read_config();
+    }
     
     initialize();
     
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::simple80x50()
         .with_title("Learn RLTK")
+        //TODO get from config
         .with_fullscreen(true)
+        //TODO get from config
         .with_vsync(true)
+        //TODO get from config, ignore if VSYNC is enabled or value returned is -1
+        .with_fps_cap(600f32)
         .build()?;
     context.with_post_scanlines(true);
 

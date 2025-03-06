@@ -1,6 +1,6 @@
 mod directories;
 
-//Struct for loading the simple .json mods
+//Struct for loading the simple .json mods, holds basic data
 //TODO figure out how to load luau mods
 //TODO Load mods alongside loading 
 pub struct RawMod {
