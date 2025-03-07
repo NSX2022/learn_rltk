@@ -11,3 +11,5 @@ If there is an entity overlapping an item, the descriptor when hovering mouse on
 WHEN CREATING SOMETHING IN RAWs ALWAYS PUT IT IN THE CORRECT CATEGORY (e.g, items[], monsters[])
 
 Convert saving and loading to binary
+
+Waveform collapse builder starts you at 0 depth where every other builder starts you at 1

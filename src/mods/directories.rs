@@ -1,6 +1,7 @@
-use std::fs;
+use std::{fs, io};
+use std::any::Any;
 use std::fs::File;
-use std::io::Write;
+use std::io::{BufRead, Write};
 use std::path::{PathBuf};
 use std::env;
 use std::ptr::write;
@@ -103,9 +104,13 @@ pub fn initialize() -> Result<(), std::io::Error> {
         writeln!(file,"//SEVERE PERFORMANCE IMPACT")?;
         writeln!(file,"//whether or not to use multithreading [DEFAULT = 1] <RANGE = 0-1>")?;
         writeln!(file,"1")?;
-
-        writeln!(file,"//frame limit [DEFAULT = -1] <RANGE = -1-2^31>")?;
+        
+        writeln!(file,"//frame limit [DEFAULT = -1] <RANGE = -1-(2^31) -1> CANNOT BE 0")?;
+        writeln!(file,"//set to -1 for no limit")?;
         writeln!(file,"-1")?;
+        
+        writeln!(file,"//whether or not to use fullscreen [DEFAULT = 1] <RANGE = 0-1>")?;
+        writeln!(file,"1")?;
         //Add more for verbose logging and such
 
         println!("config.txt created");
@@ -118,17 +123,107 @@ pub fn initialize() -> Result<(), std::io::Error> {
 }
 
 // MUST BE UPDATED every time you add a new config option
-pub fn config_defaults() -> (bool,bool,bool,bool,bool,bool,f32) { 
-    (false,false,false,true,true,true,-1f32)
+pub fn config_defaults() -> (bool,bool,bool,bool,bool,bool,f32, bool) { 
+    (false,false,false,true,true,true,-1f32, true)
 }
 
-pub fn read_config() -> (bool,bool,bool,bool,bool,bool,f32) {
-    // PLACEHOLDER, has default values
-    let to_ret = config_defaults();
-    //TODO actually read config.txt, set to_ret to those values
-    
-    
-    to_ret
+pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), io::Error> {
+    // Get the directory of the current executable
+    let exe_dir = env::current_exe()?
+        .parent()
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Could not get executable directory"))?
+        .to_path_buf();
+
+    // Construct the path to the config file
+    let config_file_path = exe_dir.join(CONFIG_DIR).join(CONFIG_FILE);
+
+    // Open the config file
+    let file = fs::File::open(&config_file_path)?;
+    let reader = io::BufReader::new(file);
+
+    // Initialize variables to hold the config values
+    let mut load_mods = false;
+    let mut show_map_creation_visualizer = false;
+    let mut show_fps = false;
+    let mut use_scanlines_shader = true;
+    let mut use_vsync = true;
+    let mut use_multithreading = true;
+    let mut frame_limit = -1f32;
+    let mut use_fullscreen = true;
+
+    // Read the file line by line
+    for (line_number, line) in reader.lines().enumerate() {
+        let line = line?;
+
+        // Skip lines that start with "//" (comments)
+        if line.trim_start().starts_with("//") {
+            continue;
+        }
+
+        // Parse the line based on its position in the file
+        eprintln!("Extracted {} from config",&line);
+        match line_number {
+            //NUMBERS NEED TO BE PRECISE WITH WHICH LINE EACH SETTING IS SET ON
+            //TODO FIX
+            2 => {
+                load_mods = parse_bool(&line)?;
+            }
+            4 => {
+                show_map_creation_visualizer = parse_bool(&line)?;
+            }
+            6 => {
+                show_fps = parse_bool(&line)?;
+            }
+            8 => {
+                use_scanlines_shader = parse_bool(&line)?;
+            }
+            10 => {
+                use_vsync = parse_bool(&line)?;
+            }
+            13 => {
+                use_multithreading = parse_bool(&line)?;
+            }
+            16 => {
+                frame_limit = parse_f32(&line)?;
+            }
+            18 => {
+                use_fullscreen = parse_bool(&line)?
+            }
+            _ => {
+                // Ignore extra lines
+                continue;
+            }
+        }
+    }
+
+    Ok((
+        load_mods,
+        show_map_creation_visualizer,
+        show_fps,
+        use_scanlines_shader,
+        use_vsync,
+        use_multithreading,
+        frame_limit,
+        use_fullscreen
+    ))
+}
+
+// helpers :)
+fn parse_f32(s: &str) -> Result<f32, io::Error> {
+    s.trim()
+        .parse::<f32>()
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+}
+
+fn parse_bool(s: &str) -> Result<bool, io::Error> {
+    match s.trim() {
+        "0" => Ok(false),
+        "1" => Ok(true),
+        _ => Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("Expected 0 or 1, found: {}", s),
+        )),
+    }
 }
 
 pub fn config_exists() -> bool {

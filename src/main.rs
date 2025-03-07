@@ -409,28 +409,46 @@ impl State {
     }
 }
 
-fn load_config_vals() {
-    //TODO
-}
-
 fn main() -> rltk::BError {
-    //TODO use to construct BTerm window
-    let mut config_data = (false,false,false,true,true,true,-1f32);
-    if(config_exists()) {
-        config_data = read_config();
-    }
+    //Installer
+    initialize().expect("Failed to initialize @main.rs");
     
-    initialize();
+    // Initialize with default values
+    let mut config_data = (false, false, false, true, true, true, -1f32, true);
+    let mut load_mods:bool = false;
+
+    // Check if the config file exists
+    if config_exists() {
+        // Attempt to read the config file
+        match read_config() {
+            Ok(data) => {
+                // Update config_data with the parsed values
+                config_data = data;
+            }
+            Err(e) => {
+                // Handle the error (e.g., log it or use defaults)
+                eprintln!("Failed to read config: {} @main.rs", e);
+                println!("Using default config values");
+            }
+        }
+    } else {
+        eprintln!("Config file does not exist. Using default values @main.rs");
+    }
+
+    load_mods = config_data.0;
+    
+    // Use config_data as needed
+    println!("Config values: {:?}", config_data);
     
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::simple80x50()
         .with_title("Learn RLTK")
         //TODO get from config
-        .with_fullscreen(true)
+        .with_fullscreen(config_data.7)
         //TODO get from config
-        .with_vsync(true)
-        //TODO get from config, ignore if VSYNC is enabled or value returned is -1
-        .with_fps_cap(600f32)
+        .with_vsync(config_data.4)
+        // ignore if VSYNC is enabled. If value returned is -1, set cap to 300fps
+            .with_fps_cap(if config_data.6 != -1.0 && !config_data.4 { config_data.6 } else{300f32})
         .build()?;
     context.with_post_scanlines(true);
 
