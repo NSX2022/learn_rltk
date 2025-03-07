@@ -1,6 +1,7 @@
 use rltk::{RGB, Rltk, Point, VirtualKeyCode, BTerm};
 use specs::prelude::*;
 use crate::rex_assets::RexAssets;
+use crate::saveload_system::does_save_exist;
 use super::{CombatStats, Player, gamelog::GameLog, Map, Name, Position, State, InBackpack, Viewshed, RunState, Equipped, HungerState, HungerClock, Hidden, SHOW_MAPGEN_VISUALIZER, camera};
 
 pub fn draw_ui(ecs: &World, ctx : &mut Rltk) {
@@ -293,14 +294,14 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
                         match selection {
                             MainMenuSelection::NewGame => newselection = MainMenuSelection::Quit,
                             MainMenuSelection::LoadGame => newselection = MainMenuSelection::NewGame,
-                            MainMenuSelection::Quit => newselection = MainMenuSelection::LoadGame
+                            MainMenuSelection::Quit => newselection = if does_save_exist() {MainMenuSelection::LoadGame} else {MainMenuSelection::NewGame}
                         }
                         return MainMenuResult::NoSelection{ selected: newselection }
                     }
                     VirtualKeyCode::Down => {
                         let newselection;
                         match selection {
-                            MainMenuSelection::NewGame => newselection = MainMenuSelection::LoadGame,
+                            MainMenuSelection::NewGame => newselection = if does_save_exist() {MainMenuSelection::LoadGame} else {MainMenuSelection::Quit},
                             MainMenuSelection::LoadGame => newselection = MainMenuSelection::Quit,
                             MainMenuSelection::Quit => newselection = MainMenuSelection::NewGame
                         }

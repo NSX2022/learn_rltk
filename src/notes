@@ -1,10 +1,8 @@
-Inventory having too many items leads to overflow via going above the amount of available chars
+Inventory having too many items leads to overflow via going above the amount of available chars, fix by implementing inventory pages
 
 Repeatedly using Confusion Scroll on enemies can negate(?) status effect
 
 You can apply statuses to items by targeting them on the ground when using a status scroll (keep this and enhance this into a mechanic?)
-
-When there is no save, Load Game is hidden (good) but is still selectable
 
 If there is an entity overlapping an item, the descriptor when hovering mouse on it is missing first char on entity name
 
@@ -12,6 +10,6 @@ If there is an entity overlapping an item, the descriptor when hovering mouse on
 
 Convert saving and loading to binary
 
-Waveform collapse builder starts you at 0 depth where every other builder starts you at 1
+Waveform collapse builder starts you at 0 depth where every other builder starts you at the appropriate depth level
 
-!WARNING! ENTITIES AND INVENTORIES ARENT SAVED IN savegame.json UNLESS YOU MODIFY THE RETURN ENTITY BUILDER IN rawmaster.rs
+!WARNING! ENTITIES AND INVENTORIES ARE NOT SAVED IN savegame.json UNLESS YOU MODIFY THE RETURN ENTITY BUILDER IN rawmaster.rs TO HAVE <Serializeme> COMPONENT

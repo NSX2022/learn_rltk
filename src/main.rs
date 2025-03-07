@@ -452,7 +452,10 @@ fn main() -> rltk::BError {
         // ignore if VSYNC is enabled. If value returned is -1, set cap to 300fps
             .with_fps_cap(if config_data.6 != -1.0 && !config_data.4 { config_data.6 } else{300f32})
         .build()?;
-    context.with_post_scanlines(true);
+    
+    if config_data.3 {
+        context.with_post_scanlines(true);
+    }
 
     let mut gs = State {
         ecs: World::new(),
@@ -512,7 +515,7 @@ fn main() -> rltk::BError {
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
     gs.ecs.insert(player_entity);
     gs.ecs.insert(RunState::MapGeneration{});
-    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Enter the Dungeon".to_string()] });
+    gs.ecs.insert(gamelog::GameLog{ entries : vec!["Enter the Dungeon".to_string()]});
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 

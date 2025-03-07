@@ -300,7 +300,11 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     
     builder.with(CullUnreachable::new());
     
-    //TODO reject map and retry if less than 10% of tiles are floor
+    //TODO put a border of impassible tiles at the map's edge
+    
+    //TODO reject map and retry if less than 20% of tiles are floor, use recursion, this should fix most impassable maps
+    
+    //TODO (hopefully) see if a pathway to stairs is possible, otherwise, reject and recurs
     
     //place stairs last
     //TODO check if stairs already exist before placing extra

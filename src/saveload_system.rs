@@ -73,6 +73,10 @@ macro_rules! deserialize_individually {
 }
 
 pub fn load_game(ecs: &mut World) {
+    if(!does_save_exist()){
+        eprintln!("SAVE DOES NOT EXIST");
+        return;
+    }
     {
         // Delete everything
         let mut to_delete = Vec::new();
@@ -83,7 +87,7 @@ pub fn load_game(ecs: &mut World) {
             ecs.delete_entity(*del).expect("Deletion failed");
         }
     }
-
+    
     let data = fs::read_to_string("./savegame.json").unwrap();
     let mut de = serde_json::Deserializer::from_str(&data);
 

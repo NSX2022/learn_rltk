@@ -178,7 +178,7 @@ pub fn draw_map(map : &Map, ctx : &mut Rltk) {
 
         // Move coordinates
         x += 1;
-        if x > (map.width * map.height) as i32-1 {
+        if x > (map.width * map.height) as i32 -1 {
             x = 0;
             y += 1;
         }

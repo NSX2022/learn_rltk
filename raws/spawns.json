@@ -1,7 +1,7 @@
 {
   "spawn_table" : [
     { "name" : "Goblin", "weight" : 10, "min_depth" : 0, "max_depth" : 100 },
-    { "name" : "Orc", "weight" : 1, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
+    { "name" : "Orc", "weight" : 0, "min_depth" : 2, "max_depth" : 100, "add_map_depth_to_weight" : true },
     { "name" : "Health Potion", "weight" : 7, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Fireball Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
     { "name" : "Confusion Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100, "add_map_depth_to_weight" : true },
@@ -10,12 +10,12 @@
     { "name" : "Ambrosia", "weight" : 4, "min_depth" : 5, "max_depth" : 100 },
     { "name" : "Dagger", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
-    { "name" : "Longsword", "weight" : 1, "min_depth" : 3, "max_depth" : 100 },
+    { "name" : "Longsword", "weight" : 2, "min_depth" : 3, "max_depth" : 100 },
     { "name" : "Tower Shield", "weight" : 1, "min_depth" : 3, "max_depth" : 100 },
     { "name" : "Rations", "weight" : 10, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Divination Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100 },
-    { "name" : "Clamp Trap", "weight" : 5, "min_depth" : 1, "max_depth" : 100 },
-    { "name" : "Battleaxe", "weight" : 1, "min_depth" : 2, "max_depth" : 100 },
+    { "name" : "Clamp Trap", "weight" : 5, "min_depth" : 3, "max_depth" : 100 },
+    { "name" : "Battleaxe", "weight" : 2, "min_depth" : 2, "max_depth" : 100 },
     { "name" : "Kobold", "weight" : 15, "min_depth" : 0, "max_depth" : 3 }
   ],
   "items" : [
@@ -103,8 +103,7 @@
       "consumable" : {
         "effects" : {
           "ranged" : "6",
-          "damage" : "20",
-          "confusion" : "4"
+          "confusion" : "6"
         }
       }
     },
