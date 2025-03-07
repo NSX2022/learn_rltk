@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use specs::prelude::*;
+use specs::saveload::{MarkedBuilder, SimpleMarker};
 use crate::components::*;
 use crate::random_table::RandomTable;
 use super::{Raws};
@@ -150,7 +151,9 @@ pub fn spawn_named_item(raws: &RawMaster, new_entity : EntityBuilder, key : &str
             eb = eb.with(DefenseBonus{ defense: shield.defense_bonus });
         }
 
-        return Some(eb.build());
+        let to_ret = eb.marked::<SimpleMarker<SerializeMe>>();
+
+        return Some(to_ret.build());
     }
     None
 }
@@ -183,7 +186,9 @@ pub fn spawn_named_mob(raws: &RawMaster, new_entity : EntityBuilder, key : &str,
         });
         eb = eb.with(Viewshed{ visible_tiles : Vec::new(), range: mob_template.vision_range, dirty: true });
 
-        return Some(eb.build());
+        let to_ret = eb.marked::<SimpleMarker<SerializeMe>>();
+        
+        return Some(to_ret.build());
     }
     None
 }
@@ -227,8 +232,9 @@ pub fn spawn_named_prop(raws: &RawMaster, new_entity : EntityBuilder, key : &str
             }
         }
 
+        let to_ret = eb.marked::<SimpleMarker<SerializeMe>>();
 
-        return Some(eb.build());
+        return Some(to_ret.build());
     }
     None
 }

@@ -1,15 +1,11 @@
-use std::collections::HashMap;
-use rltk::{RGB, RandomNumberGenerator };
+use rltk::{ RGB, RandomNumberGenerator };
 use specs::prelude::*;
+use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Rect,
+            SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, TileType, raws::* };
 use specs::saveload::{MarkedBuilder, SimpleMarker};
-use specs::shred::Fetch;
-use crate::random_table::RandomTable;
-use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Monster, BlocksTile, Rect, Item, Consumable, Ranged, ProvidesHealing, InflictsDamage, AreaOfEffect, Confusion, SerializeMe, Equippable, EquipmentSlot, MeleePowerBonus, DefenseBonus, HungerClock, HungerState, ProvidesFood, MagicMapper, Hidden, EntryTrigger, SingleActivation, TileType, BlocksVisibility, Door};
-use crate::Map;
-use crate::raws::{spawn_named_entity, spawn_named_item, SpawnType, RAWS};
-use crate::raws::{get_spawn_table_for_depth};
+use std::collections::HashMap;
 
-/// Spawns the player and returns its entity object.
+/// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
     ecs
         .create_entity()
@@ -29,10 +25,11 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
         .build()
 }
 
-const MAX_MONSTERS : i32 = 3;
-#[allow(dead_code)]
-const MAX_ITEMS : i32 = 2;
+const MAX_MONSTERS : i32 = 4;
 
+fn room_table(map_depth: i32) -> RandomTable {
+    get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth)
+}
 
 /// Fills a room with stuff!
 pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, map_depth: i32, spawn_list : &mut Vec<(usize, String)>) {
@@ -51,13 +48,8 @@ pub fn spawn_room(map: &Map, rng: &mut RandomNumberGenerator, room : &Rect, map_
     spawn_region(map, rng, &possible_targets, map_depth, spawn_list);
 }
 
-
-fn room_table(map_depth: i32) -> RandomTable {
-    get_spawn_table_for_depth(&RAWS.lock().unwrap(), map_depth)
-}
-
 /// Fills a region with stuff!
-pub fn spawn_region(map: &Map, rng: &mut RandomNumberGenerator, area : &[usize], map_depth: i32, spawn_list : &mut Vec<(usize, String)>) {
+pub fn spawn_region(_map: &Map, rng: &mut RandomNumberGenerator, area : &[usize], map_depth: i32, spawn_list : &mut Vec<(usize, String)>) {
     let spawn_table = room_table(map_depth);
     let mut spawn_points : HashMap<usize, String> = HashMap::new();
     let mut areas : Vec<usize> = Vec::from(area);

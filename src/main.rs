@@ -440,12 +440,14 @@ fn main() -> rltk::BError {
     // Use config_data as needed
     println!("Config values: {:?}", config_data);
     
+    //TODO use all values in the config
+    
     use rltk::RltkBuilder;
     let mut context = RltkBuilder::simple80x50()
         .with_title("Learn RLTK")
-        //TODO get from config
+        // get from config
         .with_fullscreen(config_data.7)
-        //TODO get from config
+        // get from config
         .with_vsync(config_data.4)
         // ignore if VSYNC is enabled. If value returned is -1, set cap to 300fps
             .with_fps_cap(if config_data.6 != -1.0 && !config_data.4 { config_data.6 } else{300f32})

@@ -164,7 +164,7 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
         eprintln!("Extracted {} from config",&line);
         match line_number {
             //NUMBERS NEED TO BE PRECISE WITH WHICH LINE EACH SETTING IS SET ON
-            //TODO FIX
+            //TODO FIX so that it goes by numbers of values collected, not specific lines
             2 => {
                 load_mods = parse_bool(&line)?;
             }
