@@ -17,7 +17,8 @@ pub fn get_screen_bounds(ecs: &World, ctx : &mut Rltk) -> (i32, i32, i32, i32) {
     (min_x, max_x, min_y, max_y)
 }
 
-const SHOW_BOUNDARIES : bool = true;
+//TODO control in config
+const SHOW_BOUNDARIES : bool = false;
 
 pub fn render_camera(ecs: &World, ctx : &mut Rltk) {
     let map = ecs.fetch::<Map>();

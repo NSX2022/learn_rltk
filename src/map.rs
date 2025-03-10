@@ -49,8 +49,6 @@ impl Map {
     }
 
     /// Generates an empty map, consisting entirely of solid walls
-    /// Generates an empty map, consisting entirely of solid walls
-
     pub fn new(new_depth : i32, width: i32, height: i32) -> Map {
         let map_tile_count = (width*height) as usize;
         Map{

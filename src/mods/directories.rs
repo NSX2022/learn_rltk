@@ -131,7 +131,7 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
     // Get the directory of the current executable
     let exe_dir = env::current_exe()?
         .parent()
-        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Could not get executable directory"))?
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Could not get executable directory @directories.rs"))?
         .to_path_buf();
 
     // Construct the path to the config file
@@ -153,41 +153,41 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
 
     // Read the file line by line
     for (line_number, line) in reader.lines().enumerate() {
-        let line = line?;
+        let read_line = line?;
 
         // Skip lines that start with "//" (comments)
-        if line.trim_start().starts_with("//") {
+        if read_line.trim_start().starts_with("//") || read_line.is_empty() {
             continue;
         }
 
         // Parse the line based on its position in the file
-        eprintln!("Extracted {} from config",&line);
+        eprintln!("Extracted {} from config",&read_line);
         match line_number {
             //NUMBERS NEED TO BE PRECISE WITH WHICH LINE EACH SETTING IS SET ON
-            //TODO FIX so that it goes by numbers of values collected, not specific lines
+            //TODO FIX so that it goes by numbers of values collected, not specific lines, to no longer necessitate hard-coding values
             2 => {
-                load_mods = parse_bool(&line)?;
+                load_mods = parse_bool(&read_line)?;
             }
             4 => {
-                show_map_creation_visualizer = parse_bool(&line)?;
+                show_map_creation_visualizer = parse_bool(&read_line)?;
             }
             6 => {
-                show_fps = parse_bool(&line)?;
+                show_fps = parse_bool(&read_line)?;
             }
             8 => {
-                use_scanlines_shader = parse_bool(&line)?;
+                use_scanlines_shader = parse_bool(&read_line)?;
             }
             10 => {
-                use_vsync = parse_bool(&line)?;
+                use_vsync = parse_bool(&read_line)?;
             }
             13 => {
-                use_multithreading = parse_bool(&line)?;
+                use_multithreading = parse_bool(&read_line)?;
             }
             16 => {
-                frame_limit = parse_f32(&line)?;
+                frame_limit = parse_f32(&read_line)?;
             }
             18 => {
-                use_fullscreen = parse_bool(&line)?
+                use_fullscreen = parse_bool(&read_line)?
             }
             _ => {
                 // Ignore extra lines

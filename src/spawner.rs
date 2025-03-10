@@ -1,9 +1,11 @@
-use rltk::{ RGB, RandomNumberGenerator };
+use std::cmp::PartialEq;
+use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
 use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Rect,
             SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, TileType, raws::* };
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
+use std::mem;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -63,7 +65,9 @@ pub fn spawn_region(_map: &Map, rng: &mut RandomNumberGenerator, area : &[usize]
             let array_index = if areas.len() == 1 { 0usize } else { (rng.roll_dice(1, areas.len() as i32)-1) as usize };
 
             let map_idx = areas[array_index];
-            spawn_points.insert(map_idx, spawn_table.roll(rng));
+            let to_spawn = spawn_table.roll(rng);
+            
+            spawn_points.insert(map_idx, to_spawn);
             areas.remove(array_index);
         }
     }
@@ -80,12 +84,14 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let width = map.width as usize;
     let x = (*spawn.0 % width) as i32;
     let y = (*spawn.0 / width) as i32;
-    std::mem::drop(map);
 
-    let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
-    if spawn_result.is_some() {
-        return;
+    if map.tiles[map.xy_idx(x,y)] == TileType::Floor {
+        mem::drop(map);
+        let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
+        if spawn_result.is_some() {
+            return;
+        }
+
+        rltk::console::log(format!("WARNING: We don't know how to spawn [{}]!", spawn.1));
     }
-
-    rltk::console::log(format!("WARNING: We don't know how to spawn [{}]!", spawn.1));
 }

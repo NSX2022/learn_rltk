@@ -30,6 +30,7 @@ mod spawner;
 mod inventory_system;
 use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem, ItemRemoveSystem };
 use crate::directories::{config_exists, initialize, read_config};
+use crate::map_builders::{stairs_present, walkable};
 
 pub mod saveload_system;
 pub mod random_table;
@@ -373,9 +374,14 @@ impl State {
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        //CONTROLS MAP SIZE
+        //Reject maps until you get a playable one
+        //random_builder() controls map size
         let mut builder = map_builders::random_builder(new_depth, &mut rng, 56,56);
+        
+        let mut rejects = 0;
+        
         builder.build_map(&mut rng);
+        
         std::mem::drop(rng);
         self.mapgen_history = builder.build_data.history.clone();
         let player_start;
@@ -406,7 +412,35 @@ impl State {
         if let Some(vs) = vs {
             vs.dirty = true;
         }
+        
+        std::mem::drop(player_position);
+        std::mem::drop(position_components);
+        std::mem::drop(player_entity);
+        std::mem::drop(viewshed_components);
+        
+        if reject_map(&self.ecs) {
+            self.generate_world_map(new_depth);
+        }
     }
+}
+
+fn reject_map(ecs: &World) -> bool {
+    
+    //Check if there are stairs
+    if !stairs_present(ecs) {
+        eprintln!("Rejected: no stairs present");
+        return true
+    }
+    
+    let min = 15;
+    
+    //check if at least min% of tiles are walkable
+    if !walkable(ecs,min){
+        eprintln!("Rejected: under {}% walkable tiles", min);
+        return true
+    }
+    
+    false
 }
 
 fn main() -> rltk::BError {
@@ -509,7 +543,8 @@ fn main() -> rltk::BError {
     //Load NON-MODDED raws before adding to World
     raws::load_raws();
 
-    gs.ecs.insert(Map::new(1, 128, 128));
+    //MUST BE THE SAME DIMENSIONS AS generate_map()
+    gs.ecs.insert(Map::new(1, 56, 56));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);
@@ -520,6 +555,12 @@ fn main() -> rltk::BError {
     gs.ecs.insert(rex_assets::RexAssets::new());
 
     gs.generate_world_map(1);
+    
+    /*if reject_map(&gs.ecs) {
+        eprintln!("Using rejected map");
+    }
+    
+     */
 
     rltk::main_loop(context, gs)
 }

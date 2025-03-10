@@ -1,5 +1,5 @@
 use std::cell::Cell;
-use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
+use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER, reject_map};
 mod simple_map;
 use simple_map::SimpleMapBuilder;
 mod bsp_dungeon;
@@ -140,6 +140,20 @@ impl BuilderChain {
     }
 }
 
+pub struct EdgeBorderBuilder;
+
+impl EdgeBorderBuilder {
+    fn new() -> Box<dyn MetaMapBuilder> {
+        Box::new(EdgeBorderBuilder)
+    }
+}
+
+impl MetaMapBuilder for EdgeBorderBuilder {
+    fn build_map(&mut self, _rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
+        edge_border(&mut build_data.map);
+    }
+}
+
 pub trait InitialMapBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
 }
@@ -273,6 +287,8 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         _ => random_shape_builder(rng, &mut builder)
     }
 
+    //TODO fix WFC making impossible maps and setting depth to 0
+    /*
     if rng.roll_dice(1, 4)==1 {
         builder.with(WaveformCollapseBuilder::new());
 
@@ -281,6 +297,15 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         builder.with(AreaStartingPosition::new(start_x, start_y));
 
         // spawn mobs
+        builder.with(VoronoiSpawning::new());
+    }
+     */
+    
+
+    if rng.roll_dice(1,100)==1 {
+        //apply 1 iteration of cellular automata, leaving only the outline of rooms
+        //this will most likely make an unplayable map
+        builder.with(CellularAutomataBuilder::new());
         builder.with(VoronoiSpawning::new());
     }
 
@@ -297,18 +322,63 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     if rng.roll_dice(1,2)==1 {
         builder.with(PrefabBuilder::vaults());
     }
+
+    //put a border of impassible tiles at the map's edge
+    builder.with(EdgeBorderBuilder::new());
     
     builder.with(CullUnreachable::new());
-    
-    //TODO put a border of impassible tiles at the map's edge
-    
-    //TODO reject map and retry if less than 20% of tiles are floor, use recursion, this should fix most impassable maps
-    
-    //TODO (hopefully) see if a pathway to stairs is possible, otherwise, reject and recurs
-    
-    //place stairs last
-    //TODO check if stairs already exist before placing extra
-    //builder.with(DistantExit::new());
 
     builder
+}
+
+pub fn edge_border(map: &mut Map) {
+    let width = map.width;
+    let height = map.height;
+
+    // Iterate over the top and bottom rows
+    for x in 0..width {
+        let top_idx = map.xy_idx(x, 0); // Top row
+        let bottom_idx = map.xy_idx(x, height - 1); // Bottom row
+        map.tiles[top_idx] = TileType::Wall;
+        map.tiles[bottom_idx] = TileType::Wall;
+    }
+
+    // Iterate over the left and right columns
+    for y in 0..height {
+        let left_idx = map.xy_idx(0, y); // Left column
+        let right_idx = map.xy_idx(width - 1, y); // Right column
+        map.tiles[left_idx] = TileType::Wall;
+        map.tiles[right_idx] = TileType::Wall;
+    }
+}
+
+pub fn stairs_present(ecs: &World) -> bool {
+    let map = ecs.fetch::<Map>();
+    let map_tile_count = (map.width * map.height) as usize;
+
+    // Ensure that there is at least 1 stairway down
+    for idx in 0..map_tile_count {
+        if map.tiles[idx] == TileType::DownStairs {
+            return true;
+        }
+    }
+    false
+}
+
+pub fn walkable(ecs: &World, min_percent: i8) -> bool {
+    let map = ecs.fetch::<Map>();
+    let map_tile_count = (map.width * map.height) as usize;
+
+    let mut num_walkable = 0;
+    for idx in 0..map_tile_count {
+        match map.tiles[idx] {
+            TileType::DownStairs | TileType::Floor => num_walkable += 1,
+            _ => {}
+        }
+    }
+
+    let percent_walkable = (num_walkable as f32 / map_tile_count as f32) * 100.0;
+    eprintln!("Walkable tiles: {}, Total tiles: {}, Percentage: {}", num_walkable, map_tile_count, percent_walkable);
+
+    percent_walkable >= min_percent as f32
 }
