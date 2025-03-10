@@ -45,7 +45,7 @@ mod mods;
 
 //For testing
 //TODO read from config file
-const SHOW_MAPGEN_VISUALIZER : bool = true;
+const SHOW_MAPGEN_VISUALIZER : bool = false;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { AwaitingInput,

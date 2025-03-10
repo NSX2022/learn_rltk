@@ -6,6 +6,7 @@ use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Rect,
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
 use std::mem;
+use crate::TileType::Floor;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -67,7 +68,12 @@ pub fn spawn_region(_map: &Map, rng: &mut RandomNumberGenerator, area : &[usize]
             let map_idx = areas[array_index];
             let to_spawn = spawn_table.roll(rng);
             
-            spawn_points.insert(map_idx, to_spawn);
+            if _map.tiles[map_idx] == Floor {
+                spawn_points.insert(map_idx, to_spawn);
+            }else{
+                rltk::console::log("Unable to spawn inside Walls in the spawn region")
+            }
+            
             areas.remove(array_index);
         }
     }
@@ -93,5 +99,7 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
         }
 
         rltk::console::log(format!("WARNING: We don't know how to spawn [{}]!", spawn.1));
+    }else {
+        rltk::console::log(format!("Unable to spawn objects in Walls"));
     }
 }
