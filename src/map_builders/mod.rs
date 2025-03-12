@@ -148,6 +148,7 @@ impl EdgeBorderBuilder {
     }
 }
 
+//DO NOT USE FOR TOWN 
 impl MetaMapBuilder for EdgeBorderBuilder {
     fn build_map(&mut self, _rng: &mut rltk::RandomNumberGenerator, build_data: &mut BuilderMap) {
         edge_border(&mut build_data.map);
@@ -288,6 +289,7 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     }
 
     //TODO fix WFC so it stops making impossible maps and setting depth to 0
+    //WFC chance should be 1/6, is 1/1 for testing
     
     if rng.roll_dice(1, 1)==1 {
         builder.with(WaveformCollapseBuilder::new());
@@ -299,7 +301,6 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         // spawn mobs
         builder.with(VoronoiSpawning::new());
     }
-    
 
     if rng.roll_dice(1,100)==1 {
         //apply 1 iteration of cellular automata, leaving only the outline of rooms

@@ -1,3 +1,4 @@
+use std::cmp::max;
 use super::{MetaMapBuilder, BuilderMap, Map, TileType};
 use rltk::RandomNumberGenerator;
 mod common;
@@ -11,8 +12,12 @@ use solver::*;
 pub struct WaveformCollapseBuilder {}
 
 impl MetaMapBuilder for WaveformCollapseBuilder {
-    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap)  {
-        self.build(rng, build_data);
+    fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap) {
+        if !self.build(rng, build_data) {
+            //This will create a map of ~99% walls, causing it to be rejected
+            eprintln!("Scrapped WFC map, restarting build process");
+            return;
+        }
     }
 }
 
@@ -23,8 +28,11 @@ impl WaveformCollapseBuilder {
         Box::new(WaveformCollapseBuilder{})
     }
 
-    fn build(&mut self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap) {
+    /// Returns true if generated under 10,000 tries, otherwise return false so that the caller of the function can generate a new map
+    fn build(&mut self, rng : &mut RandomNumberGenerator, build_data : &mut BuilderMap) -> bool {
         const CHUNK_SIZE :i32 = 8;
+        let mut tries:i32 = 0;
+        let max_tries:i32 = 10000;
         build_data.take_snapshot();
 
         let patterns = build_patterns(&build_data.map, CHUNK_SIZE, true, true);
@@ -39,12 +47,20 @@ impl WaveformCollapseBuilder {
             }
             build_data.take_snapshot();
             if solver.possible { break; } // If it has hit an impossible condition, try again
+            tries += 1;
+            eprintln!("try num {}", tries);
+            
+            if tries >= max_tries {
+                return false;
+            }
         }
         build_data.spawn_list.clear();
+        
+        true
     }
 
     fn render_tile_gallery(&mut self, constraints: &[MapChunk], chunk_size: i32, build_data : &mut BuilderMap) {
-        build_data.map = Map::new(0, build_data.map.width, build_data.map.height);
+        build_data.map = Map::new(build_data.map.depth, build_data.map.width, build_data.map.height);
         let mut counter = 0;
         let mut x = 1;
         let mut y = 1;
@@ -60,7 +76,7 @@ impl WaveformCollapseBuilder {
                 if y + chunk_size > build_data.map.height {
                     // Move to the next page
                     build_data.take_snapshot();
-                    build_data.map = Map::new(0, build_data.map.width, build_data.map.height);
+                    build_data.map = Map::new(build_data.map.depth, build_data.map.width, build_data.map.height);
 
                     x = 1;
                     y = 1;

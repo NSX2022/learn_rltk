@@ -1,13 +1,19 @@
     In order of priority/ease of implementation
+    
+-Keep fleshing out the config
    
 -Give enemies varying health, e.g +1 to -1 for kobolds and goblins, +2 to -1 for orcs
+
+-Inventory pages e.g, Scrolls->Equippable->Potions->Quest Items->Misc, or just a page for every 36 items (fixes inventory overflow glitch)
 
 -Weapons with random attributes and damage
 
 -Save to .dat instead of .json
 
--Add damage types e.g, blunt/slashing/piercing, lightning, fire, etc.
+-Add damage types e.g, blunt/slashing/piercing, lightning, fire, magic, etc.
 
 -Add more possible entity components e.g, Undead, Summoner, Cowardly, etc.
 
 -Create unique floors down to at least 20
+
+-Open world (pipe dream)

@@ -584,12 +584,6 @@ fn main() -> rltk::BError {
     gs.ecs.insert(rex_assets::RexAssets::new());
 
     gs.generate_world_map(1);
-    
-    /*if reject_map(&gs.ecs) {
-        eprintln!("Using rejected map");
-    }
-    
-     */
 
     rltk::main_loop(context, gs)
 }
