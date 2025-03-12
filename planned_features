@@ -3,3 +3,11 @@
 -Give enemies varying health, e.g +1 to -1 for kobolds and goblins, +2 to -1 for orcs
 
 -Weapons with random attributes and damage
+
+-Save to .dat instead of .json
+
+-Add damage types e.g, blunt/slashing/piercing, lightning, fire, etc.
+
+-Add more possible entity components e.g, Undead, Summoner, Cowardly, etc.
+
+-Create unique floors down to at least 20
