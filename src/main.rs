@@ -64,7 +64,6 @@ pub enum RunState { AwaitingInput,
     MapGeneration
 }
 
-
 pub struct State {
     pub ecs: World,
     mapgen_next_state : Option<RunState>,
@@ -417,30 +416,60 @@ impl State {
         std::mem::drop(position_components);
         std::mem::drop(player_entity);
         std::mem::drop(viewshed_components);
-        
-        if reject_map(&self.ecs) {
+
+        // The other function cannot be used here due to the borrow checker
+        // Check if the map should be rejected
+        let should_reject = {
+            // Perform immutable operations first
+            let ecs = &self.ecs;
+            let has_stairs = stairs_present(ecs);
+            let is_walkable = walkable(ecs, 15);
+
+            // Drop the immutable borrow before performing mutable operations
+            if !has_stairs || !is_walkable {
+                rltk::console::log("!!!Rejected map!!!".to_string());
+                true
+            } else {
+                false
+            }
+        };
+
+        if should_reject {
+            // Perform mutable operations (deleting entities) after the immutable borrow is dropped
+            let to_delete = self.entities_to_remove_on_level_change();
+            for target in to_delete {
+                self.ecs.delete_entity(target).expect("Unable to delete entity @main.rs");
+            }
+
+            // Regenerate the map
             self.generate_world_map(new_depth);
         }
     }
-}
+    fn reject_map(&mut self, ecs: &World) -> bool {
 
-fn reject_map(ecs: &World) -> bool {
-    
-    //Check if there are stairs
-    if !stairs_present(ecs) {
-        eprintln!("Rejected: no stairs present");
-        return true
+        //Delete entities from previous map
+        
+        let to_delete = self.entities_to_remove_on_level_change();
+        for target in to_delete {
+            self.ecs.delete_entity(target).expect("Unable to delete entity @main.rs");
+        }
+
+        //Check if there are stairs
+        if !stairs_present(ecs) {
+            eprintln!("Rejected: no stairs present");
+            return true
+        }
+
+        let min = 15;
+
+        //check if at least min% of tiles are walkable
+        if !walkable(ecs,min){
+            eprintln!("Rejected: under {}% walkable tiles", min);
+            return true
+        }
+
+        false
     }
-    
-    let min = 15;
-    
-    //check if at least min% of tiles are walkable
-    if !walkable(ecs,min){
-        eprintln!("Rejected: under {}% walkable tiles", min);
-        return true
-    }
-    
-    false
 }
 
 fn main() -> rltk::BError {
@@ -541,7 +570,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     
     //Load NON-MODDED raws before adding to World
-    raws::load_raws();
+    raws::load_raws("/../../raws/spawns.json".parse().unwrap());
 
     //MUST BE THE SAME DIMENSIONS AS generate_map()
     gs.ecs.insert(Map::new(1, 56, 56));

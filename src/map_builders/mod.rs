@@ -1,5 +1,5 @@
 use std::cell::Cell;
-use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER, reject_map};
+use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 mod simple_map;
 use simple_map::SimpleMapBuilder;
 mod bsp_dungeon;
@@ -287,9 +287,9 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         _ => random_shape_builder(rng, &mut builder)
     }
 
-    //TODO fix WFC making impossible maps and setting depth to 0
-    /*
-    if rng.roll_dice(1, 4)==1 {
+    //TODO fix WFC so it stops making impossible maps and setting depth to 0
+    
+    if rng.roll_dice(1, 1)==1 {
         builder.with(WaveformCollapseBuilder::new());
 
         // Now set the start to a random starting area
@@ -299,7 +299,6 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         // spawn mobs
         builder.with(VoronoiSpawning::new());
     }
-     */
     
 
     if rng.roll_dice(1,100)==1 {

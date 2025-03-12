@@ -17,6 +17,7 @@ use lazy_static::lazy_static;
 use item_structs::Item;
 use crate::raws::spawn_table_structs::SpawnTableEntry;
 
+//TODO initialize this in a function along with modded raws
 rltk::embedded_resource!(RAW_FILE, "../../raws/spawns.json");
 
 lazy_static! {
@@ -31,13 +32,13 @@ pub struct Raws {
     pub spawn_table : Vec<SpawnTableEntry>
 }
 
-pub fn load_raws() {
-    rltk::link_resource!(RAW_FILE, "../../raws/spawns.json");
+pub fn load_raws(path:String) {
+    rltk::link_resource!(RAW_FILE, path);
 
     // Retrieve the raw data as an array of u8 (8-bit unsigned chars)
     let raw_data = rltk::embedding::EMBED
         .lock()
-        .get_resource("../../raws/spawns.json".to_string())
+        .get_resource(path.to_string())
         .unwrap();
     let raw_string = std::str::from_utf8(&raw_data).expect("Unable to convert to a valid UTF-8 string.");
     let decoder : Raws = serde_json::from_str(&raw_string).expect("Unable to parse JSON");

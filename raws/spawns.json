@@ -11,11 +11,11 @@
     { "name" : "Dagger", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Shield", "weight" : 3, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Longsword", "weight" : 2, "min_depth" : 3, "max_depth" : 100 },
-    { "name" : "Tower Shield", "weight" : 1, "min_depth" : 3, "max_depth" : 100 },
+    { "name" : "Tower Shield", "weight" : 2, "min_depth" : 3, "max_depth" : 100 },
     { "name" : "Rations", "weight" : 10, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Divination Scroll", "weight" : 2, "min_depth" : 0, "max_depth" : 100 },
     { "name" : "Clamp Trap", "weight" : 5, "min_depth" : 3, "max_depth" : 100 },
-    { "name" : "Battleaxe", "weight" : 2, "min_depth" : 2, "max_depth" : 100 },
+    { "name" : "Battleaxe", "weight" : 2, "min_depth" : 4, "max_depth" : 100 },
     { "name" : "Kobold", "weight" : 15, "min_depth" : 0, "max_depth" : 3 }
   ],
   "items" : [
