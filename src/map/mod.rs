@@ -3,10 +3,10 @@ use specs::prelude::*;
 use serde::{Serialize, Deserialize};
 use std::collections::HashSet;
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize)]
-pub enum TileType {
-    Wall, Floor, DownStairs
-}
+pub mod tiletype;
+pub mod map_indexing_system;
+
+pub use tiletype::{TileType, tile_walkable, tile_opaque};
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Map {
@@ -165,6 +165,7 @@ pub fn draw_map(map : &Map, ctx : &mut Rltk) {
                     glyph = rltk::to_cp437('>');
                     fg = RGB::from_f32(0., 1.0, 1.0);
                 }
+                _ => { panic!("UNKNOWN TILE") }
             }
             if map.bloodstains.contains(&idx) { bg = RGB::from_f32(0.75, 0., 0.); }
             if !map.visible_tiles[idx] {

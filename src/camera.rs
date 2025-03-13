@@ -1,6 +1,7 @@
 use specs::prelude::*;
-use super::{Map, TileType, Position, Renderable, Hidden, SHOW_MAP_BORDER};
+use super::{Position, Renderable, Hidden, SHOW_MAP_BORDER};
 use rltk::{Point, Rltk, RGB};
+use crate::map::{Map, TileType};
 
 pub fn get_screen_bounds(ecs: &World, ctx : &mut Rltk) -> (i32, i32, i32, i32) {
     let player_pos = ecs.fetch::<Point>();
@@ -122,6 +123,7 @@ fn get_tile_glyph(idx: usize, map : &Map) -> (rltk::FontCharType, RGB, RGB) {
             glyph = rltk::to_cp437('>');
             fg = RGB::from_f32(0., 1.0, 1.0);
         }
+        _ => { panic!("UNKNOWN TILE") }
     }
     if map.bloodstains.contains(&idx) { bg = RGB::from_f32(0.75, 0., 0.); }
     if !map.visible_tiles[idx] {

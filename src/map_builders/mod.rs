@@ -1,7 +1,8 @@
 use std::any::{Any, TypeId};
 use std::cell::Cell;
 use std::option::Option;
-use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
+use rltk::Tile;
+use super::{Map, Rect, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 mod simple_map;
 use simple_map::SimpleMapBuilder;
 mod bsp_dungeon;
@@ -44,6 +45,8 @@ mod door_placement;
 use prefab_builder::*;
 use specs::prelude::*;
 use specs::saveload::ConvertSaveload;
+use crate::map::TileType;
+use crate::map::tiletype::tile_walkable;
 use crate::map_builders::area_starting_point::{AreaStartingPosition, XStart, YStart};
 use crate::map_builders::cull_unreachable::CullUnreachable;
 use crate::map_builders::distant_exit::DistantExit;
@@ -379,16 +382,14 @@ pub fn stairs_present(ecs: &World) -> bool {
     }
     false
 }
-
 pub fn walkable(ecs: &World, min_percent: i8) -> bool {
     let map = ecs.fetch::<Map>();
     let map_tile_count = (map.width * map.height) as usize;
 
     let mut num_walkable = 0;
-    for idx in 0..map_tile_count {
-        match map.tiles[idx] {
-            TileType::DownStairs | TileType::Floor => num_walkable += 1,
-            _ => {}
+    for t in &map.tiles {
+        if tile_walkable(*t) {
+            num_walkable += 1;
         }
     }
 

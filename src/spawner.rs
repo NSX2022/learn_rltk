@@ -2,11 +2,12 @@ use std::cmp::PartialEq;
 use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
 use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Rect,
-            SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, TileType, raws::* };
+            SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, raws::* };
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
 use std::mem;
-use crate::TileType::Floor;
+use crate::map::TileType;
+use crate::map::TileType::Floor;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {

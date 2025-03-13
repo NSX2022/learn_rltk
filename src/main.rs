@@ -8,11 +8,10 @@ use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
 
 mod components;
 pub use components::*;
-mod map;
+pub mod map;
 
 #[path = "mods/directories.rs"] mod directories;
 
-pub use map::*;
 mod player;
 use player::*;
 mod rect;
@@ -21,8 +20,6 @@ mod visibility_system;
 use visibility_system::VisibilitySystem;
 mod monster_ai_system;
 use monster_ai_system::MonsterAI;
-mod map_indexing_system;
-use map_indexing_system::MapIndexingSystem;
 mod melee_combat_system;
 use melee_combat_system::MeleeCombatSystem;
 mod damage_system;
@@ -33,6 +30,8 @@ mod spawner;
 mod inventory_system;
 use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem, ItemRemoveSystem };
 use crate::directories::{config_exists, initialize, read_config};
+use crate::map::Map;
+use crate::map::map_indexing_system::MapIndexingSystem;
 use crate::map_builders::{stairs_present, walkable};
 
 pub mod saveload_system;
@@ -45,7 +44,6 @@ pub mod map_builders;
 mod camera;
 mod raws;
 mod mods;
-
 // Making it static so that the config can change it, apply Mutex for thread safety
 // False by default
 lazy_static! {

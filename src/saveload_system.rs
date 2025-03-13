@@ -27,7 +27,7 @@ pub fn save_game(_ecs : &mut World) {
 #[cfg(not(target_arch = "wasm32"))]
 pub fn save_game(ecs : &mut World) {
     // Create helper
-    let mapcopy = ecs.get_mut::<super::map::Map>().unwrap().clone();
+    let mapcopy = ecs.get_mut::<super::Map>().unwrap().clone();
     let savehelper = ecs
         .create_entity()
         .with(SerializationHelper{ map : mapcopy })
@@ -110,7 +110,7 @@ pub fn load_game(ecs: &mut World) {
         let player = ecs.read_storage::<Player>();
         let position = ecs.read_storage::<Position>();
         for (e,h) in (&entities, &helper).join() {
-            let mut worldmap = ecs.write_resource::<super::map::Map>();
+            let mut worldmap = ecs.write_resource::<super::Map>();
             *worldmap = h.map.clone();
             worldmap.tile_content = vec![Vec::new(); (worldmap.height * worldmap.width) as usize];
             deleteme = Some(e);
