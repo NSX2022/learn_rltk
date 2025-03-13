@@ -1,5 +1,6 @@
-use std::any::Any;
+use std::any::{Any, TypeId};
 use std::cell::Cell;
+use std::option::Option;
 use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 mod simple_map;
 use simple_map::SimpleMapBuilder;
@@ -159,6 +160,8 @@ impl MetaMapBuilder for EdgeBorderBuilder {
 
 pub trait InitialMapBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap);
+
+    fn is_doorless(&self) -> bool { false }
 }
 
 pub trait MetaMapBuilder {
@@ -268,6 +271,7 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bu
         13 => builder.start_with(VoronoiCellBuilder::manhattan()),
         _ => builder.start_with(PrefabBuilder::constant(prefab_builder::prefab_levels::WFC_POPULATED)),
     }
+    
 
     // Set the start to the center and cull
     builder.with(AreaStartingPosition::new(XStart::CENTER, YStart::CENTER));
@@ -283,17 +287,16 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bu
 }
 
 pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
+    let mut add_doors : bool = true;
     let mut builder = BuilderChain::new(new_depth, width, height);
     let type_roll = rng.roll_dice(1, 2);
     match type_roll {
         1 => random_room_builder(rng, &mut builder),
         _ => random_shape_builder(rng, &mut builder)
     }
-
-    //TODO fix WFC so it stops making impossible maps and setting depth to 0
-    //WFC chance should be 1/6, 1/1 for testing
     
-    if rng.roll_dice(1, 6)==1 {
+    //WFC chance should be 1/6, 1/1 for testing
+    if rng.roll_dice(1, 6)==24 {
         builder.with(WaveformCollapseBuilder::new());
 
         // Now set the start to a random starting area
@@ -319,7 +322,17 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         builder.with(PrefabBuilder::sectional(prefab_builder::prefab_sections::UNDERGROUND_FOUNTAIN));
     }
 
-    builder.with(DoorPlacement::new());
+    // Dont place doors on Voronoi/Maze 
+    if let Some(starter) = &builder.starter {
+        if starter.is_doorless() {
+            eprintln!("Doorless Map");
+            add_doors = false;
+        }
+    }
+
+    if add_doors {
+        builder.with(DoorPlacement::new());
+    }
     
     if rng.roll_dice(1,2)==1 {
         builder.with(PrefabBuilder::vaults());

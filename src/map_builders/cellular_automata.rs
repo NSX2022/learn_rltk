@@ -8,6 +8,9 @@ impl InitialMapBuilder for CellularAutomataBuilder {
     fn build_map(&mut self, rng: &mut rltk::RandomNumberGenerator, build_data : &mut BuilderMap) {
         self.build(rng, build_data);
     }
+    fn is_doorless(&self) -> bool {
+        true
+    }
 }
 
 impl MetaMapBuilder for CellularAutomataBuilder {
