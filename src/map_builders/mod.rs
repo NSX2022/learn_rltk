@@ -1,7 +1,7 @@
 use std::any::{Any, TypeId};
 use std::cell::Cell;
 use std::option::Option;
-use rltk::Tile;
+use rltk::{RandomNumberGenerator, Tile};
 use super::{Map, Rect, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 mod simple_map;
 use simple_map::SimpleMapBuilder;
@@ -41,6 +41,7 @@ mod room_corridors_nearest;
 mod rooms_corridors_lines;
 mod room_corridor_spawner;
 mod door_placement;
+mod town;
 
 use prefab_builder::*;
 use specs::prelude::*;
@@ -64,6 +65,7 @@ use crate::map_builders::room_sorter::{RoomSort, RoomSorter};
 use crate::map_builders::rooms_corridors_bsp::BspCorridors;
 use crate::map_builders::rooms_corridors_dogleg::DoglegCorridors;
 use crate::map_builders::rooms_corridors_lines::StraightLineCorridors;
+use crate::map_builders::town::town_builder;
 use crate::map_builders::voronoi_spawning::VoronoiSpawning;
 
 pub struct BuilderMap {
@@ -367,6 +369,14 @@ pub fn edge_border(map: &mut Map) {
         let right_idx = map.xy_idx(width - 1, y); // Right column
         map.tiles[left_idx] = TileType::Wall;
         map.tiles[right_idx] = TileType::Wall;
+    }
+}
+
+pub fn level_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
+    rltk::console::log(format!("Depth: {}", new_depth));
+    match new_depth {
+        1 => town_builder(new_depth, rng, width, height),
+        _ => random_builder(new_depth, rng, width, height)
     }
 }
 

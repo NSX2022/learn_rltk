@@ -384,7 +384,7 @@ impl State {
         let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
         //Reject maps until you get a playable one
         //random_builder() controls map size
-        let mut builder = map_builders::random_builder(new_depth, &mut rng, 56,56);
+        let mut builder = map_builders::level_builder(new_depth, &mut rng, 86,56);
         
         let mut rejects = 0;
         
