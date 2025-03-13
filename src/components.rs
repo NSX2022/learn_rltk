@@ -201,3 +201,6 @@ pub struct SerializeMe;
 pub struct SerializationHelper {
     pub map : super::Map
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Bystander {}

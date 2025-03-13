@@ -6,8 +6,9 @@ use super::{CombatStats, Player, Renderable, Name, Position, Viewshed, Rect,
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
 use std::mem;
-use crate::map::TileType;
+use crate::map::{tile_walkable, TileType};
 use crate::map::TileType::Floor;
+use crate::map_builders::walkable;
 
 /// Spawns the player and returns his/her entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
@@ -92,7 +93,7 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
     let x = (*spawn.0 % width) as i32;
     let y = (*spawn.0 / width) as i32;
 
-    if map.tiles[map.xy_idx(x,y)] == TileType::Floor {
+    if tile_walkable(map.tiles[map.xy_idx(x,y)]) {
         mem::drop(map);
         let spawn_result = spawn_named_entity(&RAWS.lock().unwrap(), ecs.create_entity(), &spawn.1, SpawnType::AtPosition{ x, y});
         if spawn_result.is_some() {
@@ -101,6 +102,6 @@ pub fn spawn_entity(ecs: &mut World, spawn : &(&usize, &String)) {
 
         rltk::console::log(format!("WARNING: We don't know how to spawn [{}]!", spawn.1));
     }else {
-        rltk::console::log(format!("Unable to spawn objects in Walls"));
+        rltk::console::log(format!("Unable to spawn objects in Walls at ({},{})", x, y));
     }
 }

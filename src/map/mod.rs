@@ -38,6 +38,9 @@ impl Map {
     }
 
     pub fn populate_blocked(&mut self) {
+        for tile in &mut self.blocked {
+            *tile = false; // Reset blocked state
+        }
         for (i,tile) in self.tiles.iter_mut().enumerate() {
             self.blocked[i] = !tile_walkable(*tile);
         }

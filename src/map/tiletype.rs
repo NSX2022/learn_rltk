@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum TileType {
     Wall,
     Floor,
@@ -14,7 +14,7 @@ pub enum TileType {
     Gravel
 }
 
-//Update EVERY TIME YOU ADD NEW TILES
+// Update EVERY TIME YOU ADD NEW TILES
 pub fn tile_walkable(tt : TileType) -> bool {
     match tt {
         TileType::Floor | TileType::DownStairs | TileType::Road | TileType::Grass |
@@ -24,7 +24,7 @@ pub fn tile_walkable(tt : TileType) -> bool {
     }
 }
 
-//Does this tile block view?
+// Does this tile block view?
 pub fn tile_opaque(tt : TileType) -> bool {
     match tt {
         TileType::Wall => true,
@@ -32,6 +32,7 @@ pub fn tile_opaque(tt : TileType) -> bool {
     }
 }
 
+// Weights for Djkistra maps
 pub fn tile_cost(tt : TileType) -> f32 {
     match tt {
         TileType::Road => 0.8,

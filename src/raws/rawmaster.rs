@@ -174,7 +174,12 @@ pub fn spawn_named_mob(raws: &RawMaster, new_entity : EntityBuilder, key : &str,
 
         eb = eb.with(Name{ name : mob_template.name.clone() });
 
-        eb = eb.with(Monster{});
+        match mob_template.ai.as_ref() {
+            "melee" => eb = eb.with(Monster{}),
+            "bystander" => eb = eb.with(Bystander{}),
+            _ => {}
+        }
+        
         if mob_template.blocks_tile {
             eb = eb.with(BlocksTile{});
         }
@@ -249,6 +254,8 @@ pub fn spawn_named_entity(raws: &RawMaster, new_entity : EntityBuilder, key : &s
     } else if raws.prop_index.contains_key(key) {
         return spawn_named_prop(raws, new_entity, key, pos);
     }
-
+    
+    eprintln!("Entity that caused None value: {}", key);
+    
     None
 }

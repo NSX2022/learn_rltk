@@ -201,6 +201,24 @@
   ],
   "mobs" : [
     {
+      "name" : "Barkeep",
+      "renderable": {
+        "glyph" : "☺",
+        "fg" : "#EE82EE",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 16,
+        "hp" : 16,
+        "defense" : 1,
+        "power" : 4
+      },
+      "vision_range" : 4,
+      "ai" : "bystander"
+    },
+    {
       "name" : "Orc",
       "renderable": {
         "glyph" : "o",
@@ -215,7 +233,8 @@
         "defense" : 1,
         "power" : 4
       },
-      "vision_range" : 8
+      "vision_range" : 8,
+      "ai" : "melee"
     },
     {
       "name" : "Goblin",
@@ -232,7 +251,8 @@
         "defense" : 1,
         "power" : 3
       },
-      "vision_range" : 8
+      "vision_range" : 8,
+      "ai" : "melee"
     },
     {
       "name" : "Kobold",
@@ -249,7 +269,8 @@
         "defense" : 0,
         "power" : 2
       },
-      "vision_range" : 4
+      "vision_range" : 5,
+      "ai" : "melee"
     }
   ],
   "props" : [
