@@ -111,6 +111,9 @@ pub fn initialize() -> Result<(), std::io::Error> {
         
         writeln!(file,"//whether or not to use fullscreen [DEFAULT = 1] <RANGE = 0-1>")?;
         writeln!(file,"1")?;
+
+        writeln!(file,"//whether or not to show map boarder [DEFAULT = 0] <RANGE = 0-1>")?;
+        writeln!(file,"0")?;
         //Add more for verbose logging and such
 
         println!("config.txt created");
@@ -127,7 +130,7 @@ pub fn config_defaults() -> (bool,bool,bool,bool,bool,bool,f32, bool) {
     (false,false,false,true,true,true,-1f32, true)
 }
 
-pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), io::Error> {
+pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool, bool), io::Error> {
     // Get the directory of the current executable
     let exe_dir = env::current_exe()?
         .parent()
@@ -150,6 +153,7 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
     let mut use_multithreading = true;
     let mut frame_limit = -1f32;
     let mut use_fullscreen = true;
+    let mut show_border = false;
 
     // Read the file line by line
     for (line_number, line) in reader.lines().enumerate() {
@@ -187,8 +191,12 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
                 frame_limit = parse_f32(&read_line)?;
             }
             18 => {
-                use_fullscreen = parse_bool(&read_line)?
+                use_fullscreen = parse_bool(&read_line)?;
             }
+            20 => {
+                show_border = parse_bool(&read_line)?;
+            }
+            
             _ => {
                 // Ignore extra lines
                 continue;
@@ -204,7 +212,8 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool), 
         use_vsync,
         use_multithreading,
         frame_limit,
-        use_fullscreen
+        use_fullscreen,
+        show_border
     ))
 }
 

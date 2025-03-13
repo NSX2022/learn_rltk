@@ -1852,8 +1852,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tradrogueliketutorial"
-version = "0.1.0"
+name = "tradroguelike"
+version = "0.1.9"
 dependencies = [
  "lazy_static",
  "rltk",

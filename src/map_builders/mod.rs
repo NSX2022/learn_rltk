@@ -1,3 +1,4 @@
+use std::any::Any;
 use std::cell::Cell;
 use super::{Map, Rect, TileType, Position, spawner, SHOW_MAPGEN_VISUALIZER};
 mod simple_map;
@@ -41,6 +42,7 @@ mod door_placement;
 
 use prefab_builder::*;
 use specs::prelude::*;
+use specs::saveload::ConvertSaveload;
 use crate::map_builders::area_starting_point::{AreaStartingPosition, XStart, YStart};
 use crate::map_builders::cull_unreachable::CullUnreachable;
 use crate::map_builders::distant_exit::DistantExit;
@@ -73,7 +75,7 @@ pub struct BuilderMap {
 
 impl BuilderMap {
     fn take_snapshot(&mut self) {
-        if SHOW_MAPGEN_VISUALIZER {
+        if SHOW_MAPGEN_VISUALIZER.lock().unwrap().clone() {
             let mut snapshot = self.map.clone();
             for v in snapshot.revealed_tiles.iter_mut() {
                 *v = true;
@@ -289,9 +291,9 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
     }
 
     //TODO fix WFC so it stops making impossible maps and setting depth to 0
-    //WFC chance should be 1/6, is 1/1 for testing
+    //WFC chance should be 1/6, 1/1 for testing
     
-    if rng.roll_dice(1, 1)==1 {
+    if rng.roll_dice(1, 6)==1 {
         builder.with(WaveformCollapseBuilder::new());
 
         // Now set the start to a random starting area

@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use super::{Map,TileType,Position,Renderable,Hidden};
+use super::{Map, TileType, Position, Renderable, Hidden, SHOW_MAP_BORDER};
 use rltk::{Point, Rltk, RGB};
 
 pub fn get_screen_bounds(ecs: &World, ctx : &mut Rltk) -> (i32, i32, i32, i32) {
@@ -16,9 +16,6 @@ pub fn get_screen_bounds(ecs: &World, ctx : &mut Rltk) -> (i32, i32, i32, i32) {
 
     (min_x, max_x, min_y, max_y)
 }
-
-//TODO control in config
-const SHOW_BOUNDARIES : bool = false;
 
 pub fn render_camera(ecs: &World, ctx : &mut Rltk) {
     let map = ecs.fetch::<Map>();
@@ -43,7 +40,7 @@ pub fn render_camera(ecs: &World, ctx : &mut Rltk) {
                     let (glyph, fg, bg) = get_tile_glyph(idx, &*map);
                     ctx.set(x, y, fg, bg, glyph);
                 }
-            } else if SHOW_BOUNDARIES {
+            } else if *SHOW_MAP_BORDER.lock().unwrap() {
                 ctx.set(x, y, RGB::named(rltk::GRAY), RGB::named(rltk::BLACK), rltk::to_cp437('·'));
             }
             x += 1;
@@ -96,7 +93,7 @@ pub fn render_debug_map(map : &Map, ctx : &mut Rltk) {
                     let (glyph, fg, bg) = get_tile_glyph(idx, &*map);
                     ctx.set(x, y, fg, bg, glyph);
                 }
-            } else if SHOW_BOUNDARIES {
+            } else if *SHOW_MAP_BORDER.lock().unwrap() {
                 ctx.set(x, y, RGB::named(rltk::GRAY), RGB::named(rltk::BLACK), rltk::to_cp437('·'));
             }
             x += 1;

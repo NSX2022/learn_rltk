@@ -1,4 +1,7 @@
 extern crate serde;
+
+use std::sync::Mutex;
+use lazy_static::lazy_static;
 use rltk::{GameState, Rltk, Point};
 use specs::prelude::*;
 use specs::saveload::{SimpleMarker, SimpleMarkerAllocator};
@@ -43,9 +46,17 @@ mod camera;
 mod raws;
 mod mods;
 
-//For testing
-//TODO read from config file
-const SHOW_MAPGEN_VISUALIZER : bool = false;
+// Making it static so that the config can change it, apply Mutex for thread safety
+// False by default
+lazy_static! {
+    static ref SHOW_MAPGEN_VISUALIZER: Mutex<bool> = Mutex::new(false);
+}
+
+// Making it static so that the config can change it, apply Mutex for thread safety
+// False by default
+lazy_static! {
+    static ref SHOW_MAP_BORDER: Mutex<bool> = Mutex::new(false);
+}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState { AwaitingInput,
@@ -250,9 +261,7 @@ impl GameState for State {
                 }
             }
             RunState::MapGeneration => {
-                if !SHOW_MAPGEN_VISUALIZER {
-                    newrunstate = self.mapgen_next_state.unwrap();
-                } else {
+                if *SHOW_MAPGEN_VISUALIZER.lock().unwrap() {
                     ctx.cls();
                     if self.mapgen_index < self.mapgen_history.len() { camera::render_debug_map(&self.mapgen_history[self.mapgen_index], ctx); }
 
@@ -265,6 +274,8 @@ impl GameState for State {
                             newrunstate = self.mapgen_next_state.unwrap();
                         }
                     }
+                } else {
+                    newrunstate = self.mapgen_next_state.unwrap();
                 }
             }
         }
@@ -477,7 +488,7 @@ fn main() -> rltk::BError {
     initialize().expect("Failed to initialize @main.rs");
     
     // Initialize with default values
-    let mut config_data = (false, false, false, true, true, true, -1f32, true);
+    let mut config_data = (false, false, false, true, true, true, -1f32, true, false);
     let mut load_mods:bool = false;
 
     // Check if the config file exists
@@ -518,6 +529,14 @@ fn main() -> rltk::BError {
     
     if config_data.3 {
         context.with_post_scanlines(true);
+    }
+    
+    if config_data.1 {
+        *SHOW_MAPGEN_VISUALIZER.lock().unwrap() = true
+    }
+    
+    if config_data.8 {
+        *SHOW_MAP_BORDER.lock().unwrap() = true;
     }
 
     let mut gs = State {

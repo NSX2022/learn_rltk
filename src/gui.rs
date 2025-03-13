@@ -1,4 +1,5 @@
 use rltk::{RGB, Rltk, Point, VirtualKeyCode, BTerm};
+use serde_json::Value::Bool;
 use specs::prelude::*;
 use crate::rex_assets::RexAssets;
 use crate::saveload_system::does_save_exist;
@@ -250,9 +251,7 @@ pub fn main_menu(gs : &mut State, ctx : &mut Rltk) -> MainMenuResult {
     let runstate = gs.ecs.fetch::<RunState>();
     let assets = gs.ecs.fetch::<RexAssets>();
 
-    if !SHOW_MAPGEN_VISUALIZER{
-        ctx.render_xp_sprite(&assets.menu, 0, 0);
-    }
+    ctx.render_xp_sprite(&assets.menu, 0, 0);
 
     ctx.draw_box_double(24, 18, 31, 10, RGB::named(rltk::WHEAT), RGB::named(rltk::BLACK));
     ctx.print_color_centered(20, RGB::named(rltk::YELLOW), RGB::named(rltk::BLACK), "Learn RLTK");

@@ -1,6 +1,8 @@
     In order of priority/ease of implementation
     
 -Keep fleshing out the config
+
+-Ensure doors don't spawn adjacent to each other
    
 -Give enemies varying health, e.g +1 to -1 for kobolds and goblins, +2 to -1 for orcs
 
@@ -12,7 +14,7 @@
 
 -Add damage types e.g, blunt/slashing/piercing, lightning, fire, magic, etc.
 
--Add more possible entity components e.g, Undead, Summoner, Cowardly, etc.
+-Add more possible entity components e.g, Undead, Summoner, Cowardly, Mindless (can't be confused), etc.
 
 -Create unique floors down to at least 20
 
