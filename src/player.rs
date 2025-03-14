@@ -2,7 +2,7 @@ use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use std::cmp::{max, min};
 use crate::map::TileType;
-use super::{Position, Player, Viewshed, State, Map, RunState, CombatStats, WantsToMelee, Item, gamelog::GameLog, WantsToPickupItem, Monster, HungerState, HungerClock, EntityMoved, Door, BlocksVisibility, BlocksTile, Renderable};
+use super::{Position, Player, Viewshed, State, Map, RunState, CombatStats, WantsToMelee, Item, gamelog::GameLog, WantsToPickupItem, Monster, HungerState, HungerClock, EntityMoved, Door, BlocksVisibility, BlocksTile, Renderable, Bystander};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
@@ -17,28 +17,39 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut blocks_visibility = ecs.write_storage::<BlocksVisibility>();
     let mut blocks_movement = ecs.write_storage::<BlocksTile>();
     let mut renderables = ecs.write_storage::<Renderable>();
+    let bystanders = ecs.read_storage::<Bystander>();
+
+    let mut swap_entities : Vec<(Entity, i32, i32)> = Vec::new();
 
     for (entity, _player, pos, viewshed) in (&entities, &players, &mut positions, &mut viewsheds).join() {
         if pos.x + delta_x < 0 || pos.x + delta_x > map.width-1 || pos.y + delta_y < 0 || pos.y + delta_y > map.height - 1 { return; }
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
         for potential_target in map.tile_content[destination_idx].iter() {
-            let target = combat_stats.get(*potential_target);
-            if let Some(_target) = target {
-                wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
-                return;
+            let bystander = bystanders.get(*potential_target);
+            if bystander.is_some() {
+                // Note that we want to move the bystander
+                swap_entities.push((*potential_target, pos.x, pos.y));
+
+                // Move the player
+                pos.x = min(map.width-1 , max(0, pos.x + delta_x));
+                pos.y = min(map.height-1, max(0, pos.y + delta_y));
+                entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
+
+                viewshed.dirty = true;
+                let mut ppos = ecs.write_resource::<Point>();
+                ppos.x = pos.x;
+                ppos.y = pos.y;
+            } else {
+                let target = combat_stats.get(*potential_target);
+                if let Some(_target) = target {
+                    wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
+                    return;
+                }
             }
+            
             let door = doors.get_mut(*potential_target);
             if let Some(door) = door {
-                /*door.open = true;
-                blocks_visibility.remove(*potential_target);
-                blocks_movement.remove(*potential_target);
-                let glyph = renderables.get_mut(*potential_target).unwrap();
-                glyph.glyph = rltk::to_cp437('/');
-                viewshed.dirty = true;
-                 */
-                //This lets the player open and close doors, but due to the targeting being what the player walks into,
-                //the player enters a solid door and leaves it closed behind him
                 //TODO interact with doors and chests etc. with an Interact key like E for more intentional play
                 let glyph = renderables.get_mut(*potential_target).unwrap();
                 match door.open {
@@ -68,12 +79,20 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         if !map.blocked[destination_idx] {
             pos.x = min(map.width-1 , max(0, pos.x + delta_x));
             pos.y = min(map.height-1, max(0, pos.y + delta_y));
-            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker @player.rs");
+            entity_moved.insert(entity, EntityMoved{}).expect("Unable to insert marker");
 
             viewshed.dirty = true;
             let mut ppos = ecs.write_resource::<Point>();
             ppos.x = pos.x;
             ppos.y = pos.y;
+        }
+    }
+
+    for m in swap_entities.iter() {
+        let their_pos = positions.get_mut(m.0);
+        if let Some(their_pos) = their_pos {
+            their_pos.x = m.1;
+            their_pos.y = m.2;
         }
     }
 }
