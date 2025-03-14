@@ -10,7 +10,7 @@ use crate::map::{tile_walkable, TileType};
 use crate::map::TileType::Floor;
 use crate::map_builders::walkable;
 
-/// Spawns the player and returns his/her entity object.
+/// Spawns the player and returns his entity object.
 pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
     ecs
         .create_entity()
@@ -24,8 +24,8 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
         .with(Player{})
         .with(Viewshed{ visible_tiles : Vec::new(), range: 8, dirty: true })
         .with(Name{name: "Player".to_string() })
-        .with(CombatStats{ max_hp: 30, hp: 30, defense: 1, power: 5 })
-        .with(HungerClock{ state: HungerState::WellFed, duration: 40 })
+        .with(CombatStats{ max_hp: 30, hp: 30, defense: 1, power: 4 })
+        .with(HungerClock{ state: HungerState::WellFed, duration: 50 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build()
 }

@@ -41,9 +41,11 @@ pub mod hunger_system;
 pub mod rex_assets;
 pub mod trigger_system;
 pub mod map_builders;
-mod camera;
-mod raws;
-mod mods;
+pub mod camera;
+pub mod raws;
+pub mod mods;
+pub mod bystander_ai_system;
+
 // Making it static so that the config can change it, apply Mutex for thread safety
 // False by default
 lazy_static! {
@@ -89,6 +91,8 @@ impl State {
         mob.run_now(&self.ecs);
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
+        let mut bystander = bystander_ai_system::BystanderAI{};
+        bystander.run_now(&self.ecs);
         let mut triggers = trigger_system::TriggerSystem{};
         triggers.run_now(&self.ecs);
         let mut melee = MeleeCombatSystem{};
@@ -584,6 +588,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Door>();
     gs.ecs.register::<BlocksVisibility>();
     gs.ecs.register::<Bystander>();
+    gs.ecs.register::<Vendor>();
+    gs.ecs.register::<Quips>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     

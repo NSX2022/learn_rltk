@@ -252,7 +252,9 @@
         "power" : 4
       },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "bystander",
+      "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?", 
+        "Good luck out there." ]
     },
     {
       "name" : "Priest",
@@ -276,7 +278,7 @@
       "name" : "Parishioner",
       "renderable": {
         "glyph" : "☺",
-        "fg" : "#AAAAAA",
+        "fg" : "#B7A1B5",
         "bg" : "#000000",
         "order" : 1
       },
@@ -357,7 +359,9 @@
         "max_hp" : 16,
         "hp" : 16,
         "defense" : 1,
-        "power" : 4
+        "power" : 4,
+        "quips" : [ "Go out and make me proud!","Don't disappear like Dad!", "Look at you, getting into trouble...",
+        "Remember to visit me."]
       },
       "vision_range" : 4,
       "ai" : "bystander"
@@ -451,6 +455,82 @@
       },
       "vision_range" : 5,
       "ai" : "melee"
+    },
+    {
+      "name" : "Dock Worker",
+      "renderable": {
+        "glyph" : "☺",
+        "fg" : "#D6D5B8",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 16,
+        "hp" : 16,
+        "defense" : 1,
+        "power" : 4
+      },
+      "vision_range" : 4,
+      "ai" : "bystander",
+      "quips" : [ "Lovely day, eh?", "Nice weather", "Hello there" ]
+    },
+    {
+      "name" : "Fisher",
+      "renderable": {
+        "glyph" : "☺",
+        "fg" : "#B8D6D3",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 16,
+        "hp" : 16,
+        "defense" : 1,
+        "power" : 4
+      },
+      "vision_range" : 4,
+      "ai" : "bystander",
+      "quips" : [ "They're biting today!", "I caught something, but it wasn't a fish!", "Looks like rain" ]
+    },
+    {
+      "name" : "Amateur Pirate",
+      "renderable": {
+        "glyph" : "☺",
+        "fg" : "#859C72",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 16,
+        "hp" : 16,
+        "defense" : 1,
+        "power" : 4
+      },
+      "vision_range" : 4,
+      "ai" : "bystander",
+      "quips" : [ "Arrr", "Grog!", "Booze!" ]
+    },
+    {
+      "name" : "Drunk",
+      "renderable": {
+        "glyph" : "☺",
+        "fg" : "#aa9999",
+        "bg" : "#000000",
+        "order" : 1
+      },
+      "blocks_tile" : true,
+      "stats" : {
+        "max_hp" : 16,
+        "hp" : 16,
+        "defense" : 1,
+        "power" : 4
+      },
+      "vision_range" : 4,
+      "ai" : "bystander",
+      "quips" : [ "Hic", "Need... more... booze!", "Spare a copper?", "Hrrrmstendfsjfn...", "Zzz...", "Where am I?" ]
     }
   ],
   "props" : [

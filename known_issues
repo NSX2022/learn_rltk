@@ -9,3 +9,7 @@ If there is an entity overlapping an item, the descriptor when hovering mouse on
 <!WARNING!> WHEN CREATING SOMETHING IN RAWs ALWAYS PUT IT IN THE CORRECT CATEGORY (e.g, items[], monsters[])
 
 <!WARNING!> ENTITIES AND INVENTORIES ARE NOT SAVED IN savegame.json UNLESS YOU MODIFY THE RETURN ENTITY BUILDER IN rawmaster.rs TO HAVE THE <Serializeme> COMPONENT
+
+By swapping with a bystander, you can end up inside walls
+
+Bystanders will move into the same tile as you. Because we don't want to forcibly switch the player, this is an AI issue
