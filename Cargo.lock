@@ -1856,6 +1856,7 @@ name = "tradroguelike"
 version = "0.1.9"
 dependencies = [
  "lazy_static",
+ "regex",
  "rltk",
  "serde",
  "serde_json",

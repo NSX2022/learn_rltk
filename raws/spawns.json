@@ -139,13 +139,15 @@
       "name" : "Dagger",
       "renderable": {
         "glyph" : "/",
-        "fg" : "#EAEAEA",
+        "fg" : "#B9B9B9",
         "bg" : "#000000",
         "order" : 2
       },
       "weapon" : {
         "range" : "melee",
-        "power_bonus" : 2
+        "attribute" : "Quickness",
+        "base_damage" : "1d4",
+        "hit_bonus" : 0
       }
     },
     {
@@ -158,7 +160,9 @@
       },
       "weapon" : {
         "range" : "melee",
-        "power_bonus" : 4
+        "attribute" : "Might",
+        "base_damage" : "1d10",
+        "hit_bonus" : 0
       }
     },
     {
@@ -171,7 +175,9 @@
       },
       "weapon" : {
         "range" : "melee",
-        "power_bonus" : 5
+        "attribute" : "Might",
+        "base_damage" : "1d7",
+        "hit_bonus" : 2
       }
     },
     {
@@ -197,6 +203,140 @@
       "shield" : {
         "defense_bonus" : 3
       }
+    },
+    {
+      "name" : "Rusted Longsword -1",
+      "renderable": {
+        "glyph" : "/",
+        "fg" : "#BB77BB",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "weapon" : {
+        "range" : "melee",
+        "attribute" : "Might",
+        "base_damage" : "1d8-1",
+        "hit_bonus" : -1
+      }
+    },
+    {
+      "name" : "Dried Sausage",
+      "renderable": {
+        "glyph" : "%",
+        "fg" : "#00FF00",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "consumable" : {
+        "effects" : {
+          "food" : ""
+        }
+      }
+    },
+    {
+      "name" : "Beer",
+      "renderable": {
+        "glyph" : "!",
+        "fg" : "#FF00FF",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "consumable" : {
+        "effects" : { "provides_healing" : "4" }
+      }
+    },
+    {
+      "name" : "Stained Tunic",
+      "renderable": {
+        "glyph" : "[",
+        "fg" : "#00FF00",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Torso",
+        "armor_class" : 0.1
+      }
+    },
+    {
+      "name" : "Torn Trousers",
+      "renderable": {
+        "glyph" : "[",
+        "fg" : "#00FFFF",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Legs",
+        "armor_class" : 0.1
+      }
+    },
+    {
+      "name" : "Old Boots",
+      "renderable": {
+        "glyph" : "[",
+        "fg" : "#FF9999",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Legs",
+        "armor_class" : 0.1
+      }
+    },
+    {
+      "name" : "Cudgel",
+      "renderable": {
+        "glyph" : "?",
+        "fg" : "#A52A2A",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "weapon" : {
+        "range" : "melee",
+        "attribute" : "Quickness",
+        "base_damage" : "1d4",
+        "hit_bonus" : 0
+      }
+    },
+    {
+      "name" : "Cloth Tunic",
+      "renderable": {
+        "glyph" : "[",
+        "fg" : "#00FF00",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Torso",
+        "armor_class" : 0.1
+      }
+    },
+    {
+      "name" : "Cloth Pants",
+      "renderable": {
+        "glyph" : "[",
+        "fg" : "#00FFFF",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Legs",
+        "armor_class" : 0.1
+      }
+    },
+    {
+      "name" : "Slippers",
+      "renderable": {
+        "glyph" : "B",
+        "fg" : "#FF9999",
+        "bg" : "#000000",
+        "order" : 2
+      },
+      "wearable" : {
+        "slot" : "Legs",
+        "armor_class" : 0.1
+      }
     }
   ],
   "mobs" : [
@@ -209,14 +349,14 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "vendor",
+      "attributes" : {
+        "intelligence" : 13
+      },
+      "skills" : {
+        "Melee" : 2
+      }
     },
     {
       "name" : "Shady Salesman",
@@ -227,14 +367,12 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "vendor",
+      "attributes" : {
+        "quickness" : 13
+      },
+      "skills" : {}
     },
     {
       "name" : "Patron",
@@ -245,16 +383,12 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
       "ai" : "bystander",
       "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?", 
-        "Good luck out there." ]
+        "Good luck out there." ],
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Priest",
@@ -265,14 +399,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "bystander",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Parishioner",
@@ -283,14 +413,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "bystander",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Blacksmith",
@@ -301,14 +427,12 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "vendor",
+      "attributes" : {
+        "might" : 13
+      },
+      "skills" : {}
     },
     {
       "name" : "Clothier",
@@ -319,14 +443,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "vendor",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Alchemist",
@@ -337,14 +457,12 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "vendor",
+      "attributes" : {
+        "intelligence" : 15
+      },
+      "skills" : {}
     },
     {
       "name" : "Mom",
@@ -355,16 +473,11 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4,
-        "quips" : [ "Go out and make me proud!","Don't disappear like Dad!", "Look at you, getting into trouble...",
-        "Remember to visit me."]
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "bystander",
+      "quips" : [ "Go out and make me proud!","Don't disappear like your father!", "Look at you, getting into trouble...", "Remember to visit me!"],
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Peasant",
@@ -375,14 +488,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
-      "ai" : "bystander"
+      "ai" : "bystander",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Rat",
@@ -393,14 +502,13 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 2,
-        "hp" : 2,
-        "defense" : 1,
-        "power" : 3
-      },
       "vision_range" : 8,
-      "ai" : "melee"
+      "ai" : "melee",
+      "attributes" : {},
+      "skills" : {
+        "Melee" : -1,
+        "Defense" : -1
+      }
     },
     {
       "name" : "Orc",
@@ -411,14 +519,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 8,
-      "ai" : "melee"
+      "ai" : "melee",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Goblin",
@@ -429,14 +533,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 8,
-        "hp" : 8,
-        "defense" : 1,
-        "power" : 3
-      },
       "vision_range" : 8,
-      "ai" : "melee"
+      "ai" : "melee",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Kobold",
@@ -447,14 +547,10 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 4,
-        "hp" : 4,
-        "defense" : 0,
-        "power" : 2
-      },
       "vision_range" : 5,
-      "ai" : "melee"
+      "ai" : "melee",
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Dock Worker",
@@ -465,15 +561,11 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
       "ai" : "bystander",
-      "quips" : [ "Lovely day, eh?", "Nice weather", "Hello there" ]
+      "quips" : [ "Lovely day, eh?", "Nice weather", "Hello there" ],
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Fisher",
@@ -484,15 +576,11 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
       "ai" : "bystander",
-      "quips" : [ "They're biting today!", "I caught something, but it wasn't a fish!", "Looks like rain" ]
+      "quips" : [ "They're biting today!", "I caught something, but it wasn't a fish!", "Looks like rain" ],
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Amateur Pirate",
@@ -503,15 +591,11 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
       "ai" : "bystander",
-      "quips" : [ "Arrr", "Grog!", "Booze!" ]
+      "quips" : [ "Arrr", "Grog!", "Booze!" ],
+      "attributes" : {},
+      "skills" : {}
     },
     {
       "name" : "Drunk",
@@ -522,15 +606,11 @@
         "order" : 1
       },
       "blocks_tile" : true,
-      "stats" : {
-        "max_hp" : 16,
-        "hp" : 16,
-        "defense" : 1,
-        "power" : 4
-      },
       "vision_range" : 4,
       "ai" : "bystander",
-      "quips" : [ "Hic", "Need... more... booze!", "Spare a copper?", "Hrrrmstendfsjfn...", "Zzz...", "Where am I?" ]
+      "quips" : [ "Hic", "Need... more... booze!", "Spare a copper?", "Hrrrmstendfsjfn...", "Zzz...", "Where am I?" ],
+      "attributes" : {},
+      "skills" : {}
     }
   ],
   "props" : [
