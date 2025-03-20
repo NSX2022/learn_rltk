@@ -372,6 +372,7 @@ pub fn edge_border(map: &mut Map) {
     }
 }
 
+// Start at 1 for depth
 pub fn level_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     rltk::console::log(format!("Depth: {}", new_depth));
     match new_depth {

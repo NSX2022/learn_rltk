@@ -2,6 +2,12 @@
     
 -Keep fleshing out the config
 
+-Give more varied equipment to NPCs, instead of the default "[ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]"
+
+-Add more quips to NPCs
+
+-Add a boss in a maze that can track you through walls
+
 -Entities that have a intelligence < 7 cannot be affected by Confusion or other psychic things
    
 -Give enemies varying health, e.g +1 to -1 for kobolds and goblins, +2 to -1 for orcs

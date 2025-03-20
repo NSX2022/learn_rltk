@@ -53,7 +53,8 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
         .build();
 
     // Starting equipment
-    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rusted Longsword", SpawnType::Equipped{by : player});
+    // MAKE SURE THIS ONLY HAPPENS ON NEW GAME
+    spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Rusted Longsword -1", SpawnType::Equipped{by : player});
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Dried Sausage", SpawnType::Carried{by : player} );
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Beer", SpawnType::Carried{by : player});
     spawn_named_entity(&RAWS.lock().unwrap(), ecs, "Stained Tunic", SpawnType::Equipped{by : player});

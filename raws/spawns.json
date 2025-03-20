@@ -372,7 +372,8 @@
       "attributes" : {
         "quickness" : 13
       },
-      "skills" : {}
+      "skills" : {},
+      "equipped" : [ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]
     },
     {
       "name" : "Patron",
@@ -388,7 +389,8 @@
       "quips" : [ "Quiet down, it's too early!", "Oh my, I drank too much.", "Still saving the world, eh?", 
         "Good luck out there." ],
       "attributes" : {},
-      "skills" : {}
+      "skills" : {},
+      "equipped" : [ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]
     },
     {
       "name" : "Priest",
@@ -402,7 +404,8 @@
       "vision_range" : 4,
       "ai" : "bystander",
       "attributes" : {},
-      "skills" : {}
+      "skills" : {},
+      "equipped" : [ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]
     },
     {
       "name" : "Parishioner",
@@ -416,7 +419,8 @@
       "vision_range" : 4,
       "ai" : "bystander",
       "attributes" : {},
-      "skills" : {}
+      "skills" : {},
+      "equipped" : [ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]
     },
     {
       "name" : "Blacksmith",

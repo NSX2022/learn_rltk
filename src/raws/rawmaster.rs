@@ -1,12 +1,37 @@
 use std::collections::{HashMap, HashSet};
+use lazy_static::lazy_static;
 use specs::prelude::*;
-use specs::saveload::{MarkedBuilder, SimpleMarker};
 use crate::components::*;
-use crate::gamesystem::{attr_bonus, mana_at_level, npc_hp, parse_dice_string};
-use crate::random_table::RandomTable;
 use super::{Raws};
-use super::Item;
+use crate::random_table::{RandomTable};
+use regex::Regex;
+use specs::hibitset::BitSetLike;
+use specs::saveload::{MarkedBuilder, SimpleMarker};
+use crate::gamesystem::{attr_bonus, mana_at_level, npc_hp};
 
+pub fn parse_dice_string(dice : &str) -> (i32, i32, i32) {
+    lazy_static! {
+        static ref DICE_RE : Regex = Regex::new(r"(\d+)d(\d+)([\+\-]\d+)?").unwrap();
+    }
+    let mut n_dice = 1;
+    let mut die_type = 4;
+    let mut die_bonus = 0;
+    for cap in DICE_RE.captures_iter(dice) {
+        if let Some(group) = cap.get(1) {
+            n_dice = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(2) {
+            die_type = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+        if let Some(group) = cap.get(3) {
+            die_bonus = group.as_str().parse::<i32>().expect("Not a digit");
+        }
+
+    }
+    (n_dice, die_type, die_bonus)
+}
+
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 pub enum SpawnType {
     AtPosition { x: i32, y: i32 },
     Equipped { by: Entity },
@@ -64,17 +89,18 @@ impl RawMaster {
     }
 }
 
-pub fn string_to_slot(slot : &str) -> EquipmentSlot {
-    match slot {
-        "Shield" => EquipmentSlot::Shield,
-        "Head" => EquipmentSlot::Head,
-        "Torso" => EquipmentSlot::Torso,
-        "Legs" => EquipmentSlot::Legs,
-        "Feet" => EquipmentSlot::Feet,
-        "Hands" => EquipmentSlot::Hands,
-        "Melee" => EquipmentSlot::Melee,
-        _ => { rltk::console::log(format!("Warning: unknown equipment slot type [{}])", slot)); EquipmentSlot::Melee }
+fn find_slot_for_equippable_item(tag : &str, raws: &RawMaster) -> EquipmentSlot {
+    if !raws.item_index.contains_key(tag) {
+        panic!("Trying to equip an unknown item: {}", tag);
     }
+    let item_index = raws.item_index[tag];
+    let item = &raws.raws.items[item_index];
+    if let Some(_wpn) = &item.weapon {
+        return EquipmentSlot::Melee;
+    } else if let Some(wearable) = &item.wearable {
+        return string_to_slot(&wearable.slot);
+    }
+    panic!("Trying to equip {}, but it has no slot tag.", tag);
 }
 
 fn spawn_position<'a>(pos : SpawnType, new_entity : EntityBuilder<'a>, tag : &str, raws: &RawMaster) -> EntityBuilder<'a> {
@@ -91,26 +117,6 @@ fn spawn_position<'a>(pos : SpawnType, new_entity : EntityBuilder<'a>, tag : &st
     }
 }
 
-pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
-    use super::SpawnTableEntry;
-
-    let available_options : Vec<&SpawnTableEntry> = raws.raws.spawn_table
-        .iter()
-        .filter(|a| depth >= a.min_depth && depth <= a.max_depth)
-        .collect();
-
-    let mut rt = RandomTable::new();
-    for e in available_options.iter() {
-        let mut weight = e.weight;
-        if e.add_map_depth_to_weight.is_some() {
-            weight += depth;
-        }
-        rt = rt.add(e.name.clone(), weight);
-    }
-
-    rt
-}
-
 fn get_renderable_component(renderable : &super::item_structs::Renderable) -> crate::components::Renderable {
     crate::components::Renderable{
         glyph: rltk::to_cp437(renderable.glyph.chars().next().unwrap()),
@@ -120,11 +126,27 @@ fn get_renderable_component(renderable : &super::item_structs::Renderable) -> cr
     }
 }
 
+pub fn string_to_slot(slot : &str) -> EquipmentSlot {
+    match slot {
+        "Shield" => EquipmentSlot::Shield,
+        "Head" => EquipmentSlot::Head,
+        "Torso" => EquipmentSlot::Torso,
+        "Legs" => EquipmentSlot::Legs,
+        "Feet" => EquipmentSlot::Feet,
+        "Hands" => EquipmentSlot::Hands,
+        "Melee" => EquipmentSlot::Melee,
+        _ => { rltk::console::log(format!("Warning: unknown equipment slot type [{}])", slot)); EquipmentSlot::Melee }
+    }
+}
+
 pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : SpawnType) -> Option<Entity> {
     if raws.item_index.contains_key(key) {
         let item_template = &raws.raws.items[raws.item_index[key]];
 
         let mut eb = ecs.create_entity().marked::<SimpleMarker<SerializeMe>>();
+
+        // Spawn in the specified location
+        eb = spawn_position(pos, eb, key, raws);
 
         // Renderable
         if let Some(renderable) = &item_template.renderable {
@@ -179,11 +201,8 @@ pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
             eb = eb.with(Wearable{ slot, armor_class: wearable.armor_class });
         }
 
-        let to_ret = eb.marked::<SimpleMarker<SerializeMe>>();
-
-        return Some(to_ret.build());
+        return Some(eb.build());
     }
-    eprintln!("SECONDARY KEY ERROR @rawmaster.rs UNKNOWN ITEM PASSED: {}", key);
     None
 }
 
@@ -201,56 +220,24 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs : &mut World, key : &str, pos : Spa
             eb = eb.with(get_renderable_component(renderable));
         }
 
-        if let Some(quips) = &mob_template.quips {
-            eb = eb.with(Quips{
-                available: quips.clone()
-            });
-        }
-
         eb = eb.with(Name{ name : mob_template.name.clone() });
 
         match mob_template.ai.as_ref() {
             "melee" => eb = eb.with(Monster{}),
             "bystander" => eb = eb.with(Bystander{}),
             "vendor" => eb = eb.with(Vendor{}),
-            _ => { panic!("UNKNOWN AI TYPE") }
+            _ => {}
         }
 
-        let mut attr = Attributes{
-            might: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            fitness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            quickness: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-            intelligence: Attribute{ base: 11, modifiers: 0, bonus: attr_bonus(11) },
-        };
-        if let Some(might) = mob_template.attributes.might {
-            attr.might = Attribute{ base: might, modifiers: 0, bonus: attr_bonus(might) };
+        if let Some(quips) = &mob_template.quips {
+            eb = eb.with(Quips{
+                available: quips.clone()
+            });
         }
-        if let Some(fitness) = mob_template.attributes.fitness {
-            attr.fitness = Attribute{ base: fitness, modifiers: 0, bonus: attr_bonus(fitness) };
-        }
-        if let Some(quickness) = mob_template.attributes.quickness {
-            attr.quickness = Attribute{ base: quickness, modifiers: 0, bonus: attr_bonus(quickness) };
-        }
-        if let Some(intelligence) = mob_template.attributes.intelligence {
-            attr.intelligence = Attribute{ base: intelligence, modifiers: 0, bonus: attr_bonus(intelligence) };
-        }
-        eb = eb.with(attr);
 
-        let mut skills = Skills{ skills: HashMap::new() };
-        skills.skills.insert(Skill::Melee, 1);
-        skills.skills.insert(Skill::Defense, 1);
-        skills.skills.insert(Skill::Magic, 1);
-        if let Some(mobskills) = &mob_template.skills {
-            for sk in mobskills.iter() {
-                match sk.0.as_str() {
-                    "Melee" => { skills.skills.insert(Skill::Melee, *sk.1); }
-                    "Defense" => { skills.skills.insert(Skill::Defense, *sk.1); }
-                    "Magic" => { skills.skills.insert(Skill::Magic, *sk.1); }
-                    _ => { rltk::console::log(format!("Unknown skill referenced: [{}]", sk.0)); }
-                }
-            }
+        if mob_template.blocks_tile {
+            eb = eb.with(BlocksTile{});
         }
-        eb = eb.with(skills);
 
         let mut mob_fitness = 11;
         let mut mob_int = 11;
@@ -287,15 +274,45 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs : &mut World, key : &str, pos : Spa
             mana: Pool{current: mob_mana, max: mob_mana}
         };
         eb = eb.with(pools);
-        
-        if mob_template.blocks_tile {
-            eb = eb.with(BlocksTile{});
+
+        let mut skills = Skills{ skills: HashMap::new() };
+        skills.skills.insert(Skill::Melee, 1);
+        skills.skills.insert(Skill::Defense, 1);
+        skills.skills.insert(Skill::Magic, 1);
+        if let Some(mobskills) = &mob_template.skills {
+            for sk in mobskills.iter() {
+                match sk.0.as_str() {
+                    "Melee" => { skills.skills.insert(Skill::Melee, *sk.1); }
+                    "Defense" => { skills.skills.insert(Skill::Defense, *sk.1); }
+                    "Magic" => { skills.skills.insert(Skill::Magic, *sk.1); }
+                    _ => { rltk::console::log(format!("Unknown skill referenced: [{}]", sk.0)); }
+                }
+            }
         }
-        
+        eb = eb.with(skills);
+
         eb = eb.with(Viewshed{ visible_tiles : Vec::new(), range: mob_template.vision_range, dirty: true });
 
-        let eb = eb.marked::<SimpleMarker<SerializeMe>>();
-
+        if let Some(na) = &mob_template.natural {
+            let mut nature = NaturalAttackDefense{
+                armor_class : na.armor_class,
+                attacks: Vec::new()
+            };
+            if let Some(attacks) = &na.attacks {
+                for nattack in attacks.iter() {
+                    let (n, d, b) = parse_dice_string(&nattack.damage);
+                    let attack = NaturalAttack{
+                        name : nattack.name.clone(),
+                        hit_bonus : nattack.hit_bonus,
+                        damage_n_dice : n,
+                        damage_die_type : d,
+                        damage_bonus: b
+                    };
+                    nature.attacks.push(attack);
+                }
+            }
+            eb = eb.with(nature);
+        }
 
         let new_mob = eb.build();
 
@@ -350,11 +367,9 @@ pub fn spawn_named_prop(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
             }
         }
 
-        let to_ret = eb.marked::<SimpleMarker<SerializeMe>>();
 
-        return Some(to_ret.build());
+        return Some(eb.build());
     }
-    eprintln!("SECONDARY KEY ERROR @rawmaster.rs UNKNOWN PROP PASSED: {}", key);
     None
 }
 
@@ -367,20 +382,25 @@ pub fn spawn_named_entity(raws: &RawMaster, ecs : &mut World, key : &str, pos : 
         return spawn_named_prop(raws, ecs, key, pos);
     }
 
-    eprintln!("key returned None @rawmaster.rs. KEY = {}", key);
     None
 }
 
-fn find_slot_for_equippable_item(tag : &str, raws: &RawMaster) -> EquipmentSlot {
-    if !raws.item_index.contains_key(tag) {
-        panic!("Trying to equip an unknown item: {}", tag);
+pub fn get_spawn_table_for_depth(raws: &RawMaster, depth: i32) -> RandomTable {
+    use super::SpawnTableEntry;
+
+    let available_options : Vec<&SpawnTableEntry> = raws.raws.spawn_table
+        .iter()
+        .filter(|a| depth >= a.min_depth && depth <= a.max_depth)
+        .collect();
+
+    let mut rt = RandomTable::new();
+    for e in available_options.iter() {
+        let mut weight = e.weight;
+        if e.add_map_depth_to_weight.is_some() {
+            weight += depth;
+        }
+        rt = rt.add(e.name.clone(), weight);
     }
-    let item_index = raws.item_index[tag];
-    let item = &raws.raws.items[item_index];
-    if let Some(_wpn) = &item.weapon {
-        return EquipmentSlot::Melee;
-    } else if let Some(wearable) = &item.wearable {
-        return string_to_slot(&wearable.slot);
-    }
-    panic!("Trying to equip {}, but it has no slot tag.", tag);
+
+    rt
 }
