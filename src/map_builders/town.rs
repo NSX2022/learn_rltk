@@ -84,7 +84,7 @@ impl TownBuilder {
             let y = rng.roll_dice(1, build_data.height)-1;
             for x in 2 + rng.roll_dice(1, 6) .. water_width[y as usize] + 4 {
                 let idx = build_data.map.xy_idx(x, y);
-                build_data.map.tiles[idx] = TileType::WoodFloor;
+                build_data.map.tiles[idx] = TileType::Bridge;
             }
         }
         build_data.take_snapshot();
@@ -329,8 +329,9 @@ impl TownBuilder {
                     let entity_tag = to_place[0];
                     to_place.remove(0);
                     build_data.spawn_list.push((idx, entity_tag.to_string()));
-                    println!("Attempting to spawn {} at ({}, {})", entity_tag, x, y); // Debug log
+                    /*println!("Attempting to spawn {} at ({}, {})", entity_tag, x, y); // Debug log
                     println!("Tile type at ({}, {}): {:?}", x, y, build_data.map.tiles[idx]);
+                     */
                 }
             }
         }
@@ -436,7 +437,7 @@ impl TownBuilder {
                 let roll = rng.roll_dice(1, 3);
                 match roll {
                     1 => build_data.spawn_list.push((idx, "Dock Worker".to_string())),
-                    2 => build_data.spawn_list.push((idx, "Wannabe Pirate".to_string())),
+                    2 => build_data.spawn_list.push((idx, "Amateur Pirate".to_string())),
                     _ => build_data.spawn_list.push((idx, "Fisher".to_string())),
                 }
             }
