@@ -6,9 +6,11 @@
 
 -Add more quips to NPCs
 
--Add Accessories (Make sure to add to UI!)
+-Add Accessories (UI should display all equippables)
 
 -Better death screen
+
+-Autosave every X turns (optional and configurable, of course)
 
 -ADD STARTING CLASSES
 
@@ -26,14 +28,14 @@
 
 -Inventory pages e.g, Scrolls->Equippable->Potions->Quest Items->Misc, or just a page for every 36 items (fixes inventory overflow glitch)
 
--Weapons with random attributes and damage
+-Weapons with random attributes/components, damage, and hit bonus
 
 -Save to .dat instead of .json
 
 -Add damage types e.g, blunt/slashing/piercing, lightning, fire, magic, etc.
 
--Add more possible entity components e.g, Undead, Summoner, Cowardly, Mindless (can't be confused), etc.
+-Add more possible entity components e.g, Undead, Summoner, Cowardly, Keen Senses (can see through walls), etc.
 
 -Create unique floors down to at least 20
 
--Open world (pipe dream)
+-Open hecking world! (pipe dream)

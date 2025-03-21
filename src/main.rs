@@ -595,7 +595,7 @@ fn main() -> rltk::BError {
     raws::load_raws("/../../raws/spawns.json".parse().unwrap());
 
     //MUST BE THE SAME DIMENSIONS AS generate_map()
-    gs.ecs.insert(Map::new(1, 56, 56));
+    gs.ecs.insert(Map::new(1, 56, 56, "DEFAULT NAME"));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
     let player_entity = spawner::player(&mut gs.ecs, 0, 0);

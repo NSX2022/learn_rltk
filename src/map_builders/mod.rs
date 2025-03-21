@@ -42,6 +42,7 @@ mod rooms_corridors_lines;
 mod room_corridor_spawner;
 mod door_placement;
 mod town;
+mod forest;
 
 use prefab_builder::*;
 use specs::prelude::*;
@@ -52,6 +53,7 @@ use crate::map_builders::area_starting_point::{AreaStartingPosition, XStart, YSt
 use crate::map_builders::cull_unreachable::CullUnreachable;
 use crate::map_builders::distant_exit::DistantExit;
 use crate::map_builders::door_placement::DoorPlacement;
+use crate::map_builders::forest::forest_builder;
 use crate::map_builders::prefab_builder::PrefabMode::RoomVaults;
 use crate::map_builders::room_based_spawner::RoomBasedSpawner;
 use crate::map_builders::room_based_stairs::RoomBasedStairs;
@@ -98,13 +100,13 @@ pub struct BuilderChain {
 }
 
 impl BuilderChain {
-    pub fn new(new_depth : i32, width: i32, height: i32) -> BuilderChain {
+    pub fn new<S : ToString>(new_depth : i32, width: i32, height: i32, name : S) -> BuilderChain {
         BuilderChain{
             starter: None,
             builders: Vec::new(),
             build_data : BuilderMap {
                 spawn_list: Vec::new(),
-                map: Map::new(new_depth, width, height),
+                map: Map::new(new_depth, width, height, name),
                 starting_position: None,
                 rooms: None,
                 corridors: None,
@@ -293,7 +295,7 @@ fn random_shape_builder(rng: &mut rltk::RandomNumberGenerator, builder : &mut Bu
 
 pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
     let mut add_doors : bool = true;
-    let mut builder = BuilderChain::new(new_depth, width, height);
+    let mut builder = BuilderChain::new(new_depth, width, height, "Abyss, layer x"); // TODO replace with (depth - nonrandom maps)
     let type_roll = rng.roll_dice(1, 2);
     match type_roll {
         1 => random_room_builder(rng, &mut builder),
@@ -377,6 +379,7 @@ pub fn level_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, widt
     rltk::console::log(format!("Depth: {}", new_depth));
     match new_depth {
         1 => town_builder(new_depth, rng, width, height),
+        2 => forest_builder(new_depth, rng, width, height),
         _ => random_builder(new_depth, rng, width, height)
     }
 }

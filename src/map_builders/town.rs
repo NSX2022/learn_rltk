@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::map::tile_walkable;
 
 pub fn town_builder(new_depth: i32, _rng: &mut rltk::RandomNumberGenerator, width: i32, height: i32) -> BuilderChain {
-    let mut chain = BuilderChain::new(new_depth, width, height);
+    let mut chain = BuilderChain::new(new_depth, width, height, "The Town of Sneedsville");
     chain.start_with(TownBuilder::new());
     chain
 }
@@ -34,8 +34,10 @@ impl TownBuilder {
         let doors = self.add_doors(rng, build_data, &mut buildings, wall_gap_y);
         self.add_paths(build_data, &doors);
 
-        let exit_idx = build_data.map.xy_idx(build_data.width-5, wall_gap_y);
-        build_data.map.tiles[exit_idx] = TileType::DownStairs;
+        for y in wall_gap_y-3 .. wall_gap_y + 4 {
+            let exit_idx = build_data.map.xy_idx(build_data.width-2, y);
+            build_data.map.tiles[exit_idx] = TileType::DownStairs;
+        }
 
         let building_size = self.sort_buildings(&buildings);
         self.building_factory(rng, build_data, &buildings, &building_size);
