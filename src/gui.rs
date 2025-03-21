@@ -357,6 +357,32 @@ pub fn remove_item_menu(gs : &mut State, ctx : &mut Rltk) -> (ItemMenuResult, Op
     }
 }
 
+// Same as from the RLTK library but without being filled in
+pub fn draw_hollow_box(
+    console: &mut Rltk,
+    sx: i32,
+    sy: i32,
+    width: i32,
+    height: i32,
+    fg: RGB,
+    bg: RGB,
+) {
+    use rltk::to_cp437;
+
+    console.set(sx, sy, fg, bg, to_cp437('┌'));
+    console.set(sx + width, sy, fg, bg, to_cp437('┐'));
+    console.set(sx, sy + height, fg, bg, to_cp437('└'));
+    console.set(sx + width, sy + height, fg, bg, to_cp437('┘'));
+    for x in sx + 1..sx + width {
+        console.set(x, sy, fg, bg, to_cp437('─'));
+        console.set(x, sy + height, fg, bg, to_cp437('─'));
+    }
+    for y in sy + 1..sy + height {
+        console.set(sx, y, fg, bg, to_cp437('│'));
+        console.set(sx + width, y, fg, bg, to_cp437('│'));
+    }
+}
+
 #[derive(PartialEq, Copy, Clone)]
 pub enum GameOverResult { NoSelection, QuitToMenu }
 
