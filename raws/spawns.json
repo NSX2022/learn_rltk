@@ -57,7 +57,7 @@
       "consumable" : {
         "effects" : {
           "ranged" : "24",
-          "damage" : "12"
+          "damage" : "7"
         }
       }
     },
@@ -188,8 +188,9 @@
         "bg" : "#000000",
         "order" : 2
       },
-      "shield" : {
-        "defense_bonus" : 1
+      "wearable" : {
+        "slot" : "Shield",
+        "armor_class" : 1.0
       }
     },
     {
@@ -200,8 +201,9 @@
         "bg" : "#000000",
         "order" : 2
       },
-      "shield" : {
-        "defense_bonus" : 3
+      "wearable" : {
+        "slot" : "Shield",
+        "armor_class" : 2.0
       }
     },
     {

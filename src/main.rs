@@ -513,7 +513,8 @@ fn main() -> rltk::BError {
     //TODO use all values in the config
     
     use rltk::RltkBuilder;
-    let mut context = RltkBuilder::simple80x50()
+    let mut context = RltkBuilder::simple(80, 60)
+        .unwrap()
         .with_title("Learn RLTK")
         // get from config
         .with_fullscreen(config_data.7)
