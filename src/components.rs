@@ -274,3 +274,10 @@ pub struct MeleeWeapon {
 pub struct LootTable {
     pub table : String
 }
+
+// AI, Carnivores (melee) are aggressive towards Herbivores (bystander)
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Carnivore {}
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct Herbivore {}

@@ -46,6 +46,7 @@ pub mod raws;
 pub mod mods;
 pub mod bystander_ai_system;
 mod gamesystem;
+mod animal_ai_system;
 
 // Making it static so that the config can change it, apply Mutex for thread safety
 // False by default
@@ -112,6 +113,8 @@ impl State {
         hunger.run_now(&self.ecs);
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
+        let mut animal_ai = animal_ai_system::AnimalAI{};
+        animal_ai.run_now(&self.ecs);
 
         self.ecs.maintain();
     }
@@ -589,6 +592,8 @@ fn main() -> rltk::BError {
     gs.ecs.register::<Wearable>();
     gs.ecs.register::<NaturalAttackDefense>();
     gs.ecs.register::<LootTable>();
+    gs.ecs.register::<Carnivore>();
+    gs.ecs.register::<Herbivore>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     
