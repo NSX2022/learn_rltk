@@ -1,6 +1,8 @@
 use super::{Map, TileType};
 use rltk::RGB;
 
+//TODO themes for caves, abyss, etc.
+
 pub fn tile_glyph(idx: usize, map : &Map) -> (rltk::FontCharType, RGB, RGB) {
     let mut to_ret = match map.depth {
         2 => get_forest_glyph(idx, map),
@@ -9,6 +11,7 @@ pub fn tile_glyph(idx: usize, map : &Map) -> (rltk::FontCharType, RGB, RGB) {
 
     let mut bg = RGB::from_f32(0f32,0f32,0f32);
     
+    // MAKE SURE TO SHOW BLOODSTAINS
     if map.bloodstains.contains(&idx) { bg = RGB::from_f32(0.75, 0., 0.); }
     if !map.visible_tiles[idx] {
         bg = RGB::from_f32(0., 0., 0.); // Don't show stains out of visual range

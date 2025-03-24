@@ -4,8 +4,6 @@ Repeatedly using Confusion Scroll on enemies can negate(?) status effect or does
 
 You can apply status components to items by targeting them on the ground when using a status scroll (keep this and enhance this into a mechanic?)
 
-If there is an entity overlapping an item, the descriptor when hovering mouse on it is missing first char on entity name
-
 <!WARNING!> WHEN CREATING SOMETHING IN RAWs ALWAYS PUT IT IN THE CORRECT CATEGORY (e.g, items[], monsters[])
 
 <!WARNING!> ENTITIES AND INVENTORIES ARE NOT SAVED IN savegame.json UNLESS YOU MODIFY THE RETURN ENTITY BUILDER IN rawmaster.rs TO HAVE THE <Serializeme> COMPONENT

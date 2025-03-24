@@ -269,3 +269,8 @@ pub struct MeleeWeapon {
     pub damage_bonus : i32,
     pub hit_bonus : i32
 }
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
+pub struct LootTable {
+    pub table : String
+}

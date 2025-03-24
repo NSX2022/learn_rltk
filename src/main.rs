@@ -588,6 +588,7 @@ fn main() -> rltk::BError {
     gs.ecs.register::<MeleeWeapon>();
     gs.ecs.register::<Wearable>();
     gs.ecs.register::<NaturalAttackDefense>();
+    gs.ecs.register::<LootTable>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     
