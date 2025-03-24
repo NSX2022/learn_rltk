@@ -93,6 +93,8 @@ impl State {
         mob.run_now(&self.ecs);
         let mut mapindex = MapIndexingSystem{};
         mapindex.run_now(&self.ecs);
+        let mut animal = animal_ai_system::AnimalAI{};
+        animal.run_now(&self.ecs);
         let mut bystander = bystander_ai_system::BystanderAI{};
         bystander.run_now(&self.ecs);
         let mut triggers = trigger_system::TriggerSystem{};
@@ -113,8 +115,6 @@ impl State {
         hunger.run_now(&self.ecs);
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
-        let mut animal_ai = animal_ai_system::AnimalAI{};
-        animal_ai.run_now(&self.ecs);
 
         self.ecs.maintain();
     }

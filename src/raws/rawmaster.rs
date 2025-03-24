@@ -214,7 +214,7 @@ pub fn spawn_named_item(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
 
         return Some(eb.build());
     }
-    eprintln!("No raw entry for {}", key);
+    eprintln!("No raw entry for {} item", key);
     None
 }
 
@@ -343,7 +343,7 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs : &mut World, key : &str, pos : Spa
 
         return Some(new_mob);
     }
-    eprintln!("No raw entry for {}", key);
+    eprintln!("No raw entry for {} mob", key);
     None
 }
 
@@ -389,7 +389,7 @@ pub fn spawn_named_prop(raws: &RawMaster, ecs : &mut World, key : &str, pos : Sp
 
         return Some(eb.build());
     }
-    eprintln!("No raw entry for {}", key);
+    eprintln!("No raw entry for {} prop", key);
     None
 }
 
@@ -401,7 +401,7 @@ pub fn spawn_named_entity(raws: &RawMaster, ecs : &mut World, key : &str, pos : 
     } else if raws.prop_index.contains_key(key) {
         return spawn_named_prop(raws, ecs, key, pos);
     }
-    eprintln!("No raw entry for {}", key);
+    eprintln!("No raw entry for {} named entity", key);
     None
 }
 
