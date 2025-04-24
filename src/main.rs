@@ -32,7 +32,10 @@ use inventory_system::{ ItemCollectionSystem, ItemUseSystem, ItemDropSystem, Ite
 use crate::directories::{config_exists, initialize, read_config};
 use crate::map::Map;
 use crate::map::map_indexing_system::MapIndexingSystem;
-use crate::map_builders::{stairs_present, walkable};
+use crate::map_builders::{down_stairs_present, walkable};
+
+use map::dungeon::MasterDungeonMap;
+use crate::map::dungeon::level_transition;
 
 pub mod saveload_system;
 pub mod random_table;
@@ -71,6 +74,7 @@ pub enum RunState { AwaitingInput,
     MainMenu { menu_selection : gui::MainMenuSelection },
     SaveGame,
     NextLevel,
+    PreviousLevel,
     ShowRemoveItem,
     GameOver,
     MagicMapReveal { row : i32 },
@@ -251,8 +255,14 @@ impl GameState for State {
                 newrunstate = RunState::MainMenu{ menu_selection : gui::MainMenuSelection::LoadGame };
             }
             RunState::NextLevel => {
-                self.goto_next_level();
-                newrunstate = RunState::PreRun;
+                self.goto_level(1);
+                self.mapgen_next_state = Some(RunState::PreRun);
+                newrunstate = RunState::MapGeneration;
+            }
+            RunState::PreviousLevel => {
+                self.goto_level(-1);
+                self.mapgen_next_state = Some(RunState::PreRun);
+                newrunstate = RunState::MapGeneration;
             }
             RunState::MagicMapReveal{row} => {
                 let mut map = self.ecs.fetch_mut::<Map>();
@@ -335,25 +345,18 @@ impl State {
         to_delete
     }
 
-    fn goto_next_level(&mut self) {
-        // Delete entities that aren't the player or his/her equipment
-        let to_delete = self.entities_to_remove_on_level_change();
-        for target in to_delete {
-            self.ecs.delete_entity(target).expect("Unable to delete entity @main.rs");
-        }
+    fn goto_level(&mut self, offset: i32) {
+        map::dungeon::freeze_level_entities(&mut self.ecs);
 
         // Build a new map and place the player
-        let current_depth;
-        {
-            let worldmap_resource = self.ecs.fetch::<Map>();
-            current_depth = worldmap_resource.depth;
-        }
-        self.generate_world_map(current_depth + 1);
-        
-        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
-        gamelog.entries.push("You descend to the next level.".to_string());
-    }
+        let current_depth = self.ecs.fetch::<Map>().depth;
+        self.generate_world_map(current_depth + offset, offset);
 
+        // Notify the player
+        let mut gamelog = self.ecs.fetch_mut::<gamelog::GameLog>();
+        gamelog.entries.push("You change level.".to_string());
+    }
+    
     fn game_over_cleanup(&mut self) {
         // Delete everything
         let mut to_delete = Vec::new();
@@ -374,66 +377,32 @@ impl State {
             *player_entity_writer = player_entity;
         }
 
+        // Replace the world maps
+        self.ecs.insert(MasterDungeonMap::new());
+
         // Build a new map and place the player
-        self.generate_world_map(1);
+        self.generate_world_map(1, 0);
     }
 
-    fn generate_world_map(&mut self, new_depth : i32) {
+    fn generate_world_map(&mut self, new_depth : i32, offset: i32) {
         self.mapgen_index = 0;
         self.mapgen_timer = 0.0;
         self.mapgen_history.clear();
-        let mut rng = self.ecs.write_resource::<rltk::RandomNumberGenerator>();
-        //Reject maps until you get a playable one
-        //random_builder() controls map size
-        let mut builder = map_builders::level_builder(new_depth, &mut rng, 86,56);
         
-        let mut rejects = 0;
-        
-        builder.build_map(&mut rng);
-        
-        std::mem::drop(rng);
-        self.mapgen_history = builder.build_data.history.clone();
-        let player_start;
-        {
-            let mut worldmap_resource = self.ecs.write_resource::<Map>();
-            *worldmap_resource = builder.build_data.map.clone();
-            player_start = builder.build_data.starting_position.as_mut().unwrap().clone();
+        let map_building_info = level_transition(&mut self.ecs, new_depth, offset);
+        if let Some(history) = map_building_info {
+            self.mapgen_history = history;
+        } else {
+            map::dungeon::thaw_level_entities(&mut self.ecs);
         }
-
-        // Spawn chuddies
-        builder.spawn_entities(&mut self.ecs);
-
-        // Place the player and update resources
-        let (player_x, player_y) = (player_start.x, player_start.y);
-        let mut player_position = self.ecs.write_resource::<Point>();
-        *player_position = Point::new(player_x, player_y);
-        let mut position_components = self.ecs.write_storage::<Position>();
-        let player_entity = self.ecs.fetch::<Entity>();
-        let player_pos_comp = position_components.get_mut(*player_entity);
-        if let Some(player_pos_comp) = player_pos_comp {
-            player_pos_comp.x = player_x;
-            player_pos_comp.y = player_y;
-        }
-
-        // Mark the player's visibility as dirty
-        let mut viewshed_components = self.ecs.write_storage::<Viewshed>();
-        let vs = viewshed_components.get_mut(*player_entity);
-        if let Some(vs) = vs {
-            vs.dirty = true;
-        }
-        
-        std::mem::drop(player_position);
-        std::mem::drop(position_components);
-        std::mem::drop(player_entity);
-        std::mem::drop(viewshed_components);
 
         // The other function cannot be used here due to the borrow checker
         // Check if the map should be rejected
         let should_reject = {
             // Perform immutable operations first
             let ecs = &self.ecs;
-            let has_stairs = stairs_present(ecs);
-            let is_walkable = walkable(ecs, 15);
+            let has_stairs = down_stairs_present(ecs);
+            let is_walkable = walkable(ecs, 11);
 
             // Drop the immutable borrow before performing mutable operations
             if !has_stairs || !is_walkable {
@@ -452,9 +421,10 @@ impl State {
             }
 
             // Regenerate the map
-            self.generate_world_map(new_depth);
+            self.generate_world_map(new_depth, offset);
         }
     }
+
     fn reject_map(&mut self, ecs: &World) -> bool {
 
         //Delete entities from previous map
@@ -465,7 +435,7 @@ impl State {
         }
 
         //Check if there are stairs
-        if !stairs_present(ecs) {
+        if !down_stairs_present(ecs) {
             eprintln!("Rejected: no stairs present");
             return true
         }
@@ -594,13 +564,17 @@ fn main() -> rltk::BError {
     gs.ecs.register::<LootTable>();
     gs.ecs.register::<Carnivore>();
     gs.ecs.register::<Herbivore>();
+    gs.ecs.register::<OtherLevelPosition>();
+    gs.ecs.register::<DMSerializationHelper>();
+    gs.ecs.register::<SerializationHelper>();
 
     gs.ecs.insert(SimpleMarkerAllocator::<SerializeMe>::new());
     
-    //Load NON-MODDED raws before adding to World
+    // Load NON-MODDED raws before adding to World
     raws::load_raws("/../../raws/spawns.json".parse().unwrap());
 
-    //MUST BE THE SAME DIMENSIONS AS generate_map()
+    // MUST BE THE SAME DIMENSIONS AS generate_map()
+    gs.ecs.insert(MasterDungeonMap::new());
     gs.ecs.insert(Map::new(1, 56, 56, "DEFAULT NAME"));
     gs.ecs.insert(Point::new(0, 0));
     gs.ecs.insert(rltk::RandomNumberGenerator::new());
@@ -611,7 +585,7 @@ fn main() -> rltk::BError {
     gs.ecs.insert(particle_system::ParticleBuilder::new());
     gs.ecs.insert(rex_assets::RexAssets::new());
 
-    gs.generate_world_map(1);
+    gs.generate_world_map(1,0);
 
     rltk::main_loop(context, gs)
 }

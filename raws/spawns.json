@@ -26,8 +26,8 @@
   "loot_tables" : [
     { "name" : "Animal",
       "drops" : [
-        { "name" : "Hide", "weight" : 10 },
-        { "name" : "Meat", "weight" : 10 }
+        { "name" : "Hide", "weight" : 1000 },
+        { "name" : "Meat", "weight" : 1000 }
       ]
     }
   ],

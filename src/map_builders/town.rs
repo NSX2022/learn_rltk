@@ -33,7 +33,7 @@ impl TownBuilder {
         let mut buildings = self.buildings(rng, build_data, &mut available_building_tiles);
         let doors = self.add_doors(rng, build_data, &mut buildings, wall_gap_y);
         self.add_paths(build_data, &doors);
-
+        
         for y in wall_gap_y-3 .. wall_gap_y + 4 {
             let exit_idx = build_data.map.xy_idx(build_data.width-2, y);
             build_data.map.tiles[exit_idx] = TileType::DownStairs;
@@ -215,6 +215,7 @@ impl TownBuilder {
                 build_data.map.xy_idx(door_x, building.1 + building.3 - 1)
             };
             build_data.map.tiles[idx] = TileType::Floor;
+            // Disable pushing to the spawn list if you want to prevent doors spawning
             build_data.spawn_list.push((idx, "Door".to_string()));
             doors.push(idx);
         }

@@ -5,6 +5,7 @@ use rltk::{RGB};
 use serde::{Serialize, Deserialize};
 use specs::saveload::{Marker, ConvertSaveload};
 use specs::error::NoError;
+use crate::map;
 
 #[derive(Component, ConvertSaveload, Clone)]
 pub struct Position {
@@ -46,17 +47,18 @@ pub struct WantsToMelee {
     pub target : Entity
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
+
+#[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct SufferDamage {
-    pub amount : Vec<i32>
+    pub amount : Vec<(i32, bool)>,
 }
 
 impl SufferDamage {
-    pub fn new_damage(store: &mut WriteStorage<SufferDamage>, victim: Entity, amount: i32) {
+    pub fn new_damage(store: &mut WriteStorage<SufferDamage>, victim: Entity, amount: i32, from_player: bool) {
         if let Some(suffering) = store.get_mut(victim) {
-            suffering.amount.push(amount);
+            suffering.amount.push((amount, from_player));
         } else {
-            let dmg = SufferDamage { amount : vec![amount] };
+            let dmg = SufferDamage { amount : vec![(amount, from_player)] };
             store.insert(victim, dmg).expect("Unable to insert damage");
         }
     }
@@ -281,3 +283,16 @@ pub struct Carnivore {}
 
 #[derive(Component, Debug, Serialize, Deserialize, Clone)]
 pub struct Herbivore {}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct OtherLevelPosition {
+    pub x: i32,
+    pub y: i32,
+    pub depth: i32
+}
+
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct DMSerializationHelper {
+    pub map : map::dungeon::MasterDungeonMap
+}
+

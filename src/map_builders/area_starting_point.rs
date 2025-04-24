@@ -66,5 +66,11 @@ impl AreaStartingPosition {
         let start_y = available_floors[0].0 as i32 / build_data.map.width;
 
         build_data.starting_position = Some(Position{x : start_x, y: start_y});
+        /*let up_idx = build_data.map.xy_idx(start_x,start_y);
+        
+        if build_data.map.depth > 1 {
+            build_data.map.tiles[up_idx] = TileType::UpStairs;
+        }
+         */
     }
 }

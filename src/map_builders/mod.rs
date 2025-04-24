@@ -384,7 +384,7 @@ pub fn level_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, widt
     }
 }
 
-pub fn stairs_present(ecs: &World) -> bool {
+pub fn down_stairs_present(ecs: &World) -> bool {
     let map = ecs.fetch::<Map>();
     let map_tile_count = (map.width * map.height) as usize;
 

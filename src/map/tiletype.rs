@@ -11,14 +11,16 @@ pub enum TileType {
     DeepWater,
     WoodFloor,
     Bridge,
-    Gravel
+    Gravel,
+    UpStairs
 }
 
-// Update EVERY TIME YOU ADD NEW TILES
+// Update EVERY TIME YOU ADD NEW WALKABLE TILES
 pub fn tile_walkable(tt : TileType) -> bool {
     match tt {
         TileType::Floor | TileType::DownStairs | TileType::Road | TileType::Grass |
-        TileType::ShallowWater | TileType::WoodFloor | TileType::Bridge | TileType::Gravel
+        TileType::ShallowWater | TileType::WoodFloor | TileType::Bridge | TileType::Gravel |
+        TileType::UpStairs
         => true,
         _ => false
     }
@@ -32,7 +34,7 @@ pub fn tile_opaque(tt : TileType) -> bool {
     }
 }
 
-// Weights for Djkistra maps
+// Weights for Dijkstra maps
 pub fn tile_cost(tt : TileType) -> f32 {
     match tt {
         TileType::Road => 0.8,

@@ -1,3 +1,5 @@
+DOORS, EVEN WHEN OPEN, ARE IMPASSABLE
+
 Inventory having too many items leads to overflow via going above the amount of available chars
 
 Repeatedly using Confusion Scroll on enemies can negate(?) status effect or doesn't stack
@@ -15,3 +17,5 @@ Bystanders will move into the same tile as you. Because we don't want to forcibl
 Log isn't cleared when you die
 
 Possible that deer can get hit from x+1 y+1 of where the Player/Wolf is attacking. Could be due to lag, where deer moves immediately after being attacked but the particle lingers
+
+Deep ocean tiles are rendered grey out of sight (shouldn't be rendered at all)

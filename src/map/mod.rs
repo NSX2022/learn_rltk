@@ -6,9 +6,13 @@ use std::collections::HashSet;
 pub mod tiletype;
 pub mod map_indexing_system;
 pub mod themes;
+pub mod dungeon;
 
 pub use tiletype::{TileType, tile_walkable, tile_opaque};
+use crate::map::dungeon::MasterDungeonMap;
 use crate::map::tiletype::tile_cost;
+use crate::{Position, Viewshed};
+use crate::map_builders::level_builder;
 
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Map {

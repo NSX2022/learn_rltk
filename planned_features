@@ -2,7 +2,9 @@
     
 -Keep fleshing out the config
 
--Give more varied equipment to NPCs, instead of the default "[ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]"
+-(woods only) Make bandits more common but make them only spawn on the road
+
+-Give more varied equipment to town NPCs, instead of the default "[ "Cudgel", "Cloth Tunic", "Cloth Pants", "Slippers" ]"
 
 -Add more quips to NPCs
 
@@ -18,6 +20,8 @@
 
 -ADD STARTING CLASSES
 
+-Add ways to improve skills
+
 -Add a boss in a maze that can track you through walls
 
 -Entities that have a intelligence < 7 cannot be affected by Confusion or other psychic things
@@ -26,7 +30,7 @@
 
 -Digging/Mining
 
--Crafting
+-Crafting system
 
 -Critical hits & crit bonuses for weapons/equipment
 
@@ -47,3 +51,5 @@
 -Create unique floors down to at least 20
 
 -Open hecking world! (pipe dream)
+
+-Sandbox features, e.g, building things
