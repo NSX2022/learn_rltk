@@ -109,7 +109,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     }
                 } else  if natural_roll == 1 {
                     // Natural 1 miss
-                    log.entries.push(format!("{} considers attacking {}, but misjudges the timing.", name.name, target_name.name));
+                    log.entries.push(format!("{} tries attacking {}, but misjudges the timing.", name.name, target_name.name));
                     if let Some(pos) = positions.get(wants_melee.target) {
                         particle_builder.request(pos.x, pos.y, rltk::RGB::named(rltk::BLUE), rltk::RGB::named(rltk::BLACK), rltk::to_cp437('‼'), 200.0);
                     }
