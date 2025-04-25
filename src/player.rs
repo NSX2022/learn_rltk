@@ -328,6 +328,10 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             // Save and Quit
             VirtualKeyCode::Escape => return RunState::SaveGame,
 
+            // Cheating!
+            // TODO disable achievements/permanence features if this is ever enabled via inserting a marker in the save file
+            VirtualKeyCode::Backslash => return RunState::ShowCheatMenu,
+
             _ => { return RunState::AwaitingInput }
         },
     }

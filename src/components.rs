@@ -296,3 +296,8 @@ pub struct DMSerializationHelper {
     pub map : map::dungeon::MasterDungeonMap
 }
 
+#[derive(Component, Serialize, Deserialize, Clone)]
+pub struct LightSource {
+    pub color : RGB,
+    pub range: i32
+}

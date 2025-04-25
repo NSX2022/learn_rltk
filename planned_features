@@ -1,6 +1,6 @@
     In order of priority/ease of implementation
     
--Keep fleshing out the config
+-Keep fleshing out the config (Enable/Disable cheats)
 
 -(woods only) Make bandits more common but make them only spawn on the road
 
@@ -9,6 +9,8 @@
 -Add more quips to NPCs
 
 -Add more loot to NPCs, better loot tables
+
+-Achievements (only obtainable with cheats disabled)
 
 -Make it optional to save bloodstains and/or even have them in the first place
 
