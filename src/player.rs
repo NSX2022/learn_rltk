@@ -116,14 +116,14 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     }
 
     for m in swap_entities.iter() {
-        
+
         let their_pos = positions.get_mut(m.0);
         if let Some(their_pos) = their_pos {
             their_pos.x = m.1;
             their_pos.y = m.2;
             result = RunState::PlayerTurn;
         }
-        
+
     }
 
     result
@@ -155,7 +155,7 @@ pub fn try_previous_level(ecs: &mut World) -> bool {
     }
 }
 
-fn get_item(ecs: &mut World) {
+fn get_item(ecs: &mut World) -> RunState {
     let player_pos = ecs.fetch::<Point>();
     let player_entity = ecs.fetch::<Entity>();
     let entities = ecs.entities();
@@ -175,8 +175,10 @@ fn get_item(ecs: &mut World) {
         Some(item) => {
             let mut pickup = ecs.write_storage::<WantsToPickupItem>();
             pickup.insert(*player_entity, WantsToPickupItem{ collected_by: *player_entity, item }).expect("Unable to insert want to pickup");
+            return RunState::PlayerTurn
         }
     }
+    return AwaitingInput;
 }
 
 fn skip_turn(ecs: &mut World) -> RunState {
@@ -318,7 +320,7 @@ pub fn player_input(gs: &mut State, ctx: &mut Rltk) -> RunState {
             }
 
             // Picking up items
-            VirtualKeyCode::G => get_item(&mut gs.ecs),
+            VirtualKeyCode::G => return get_item(&mut gs.ecs),
             VirtualKeyCode::I => return RunState::ShowInventory,
             VirtualKeyCode::D => return RunState::ShowDropItem,
             VirtualKeyCode::R => return RunState::ShowRemoveItem,
