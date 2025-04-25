@@ -1,7 +1,7 @@
 use std::cmp::PartialEq;
 use rltk::{RGB, RandomNumberGenerator };
 use specs::prelude::*;
-use super::{Player, Renderable, Name, Position, Viewshed, Rect, SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, raws::*, Attributes, Attribute, Skill, Skills, Pools, Pool};
+use super::{Player, Renderable, Name, Position, Viewshed, Rect, SerializeMe, random_table::RandomTable, HungerClock, HungerState, Map, raws::*, Attributes, Attribute, Skill, Skills, Pools, Pool, LightSource};
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use std::collections::HashMap;
 use std::mem;
@@ -49,6 +49,9 @@ pub fn player(ecs : &mut World, player_x : i32, player_y : i32) -> Entity {
             xp: 0,
             level: 1
         })
+        // player's "torch" to navigate underground unlit areas
+        //TODO add game mechanics that upgrade/change/unlock this
+        .with(LightSource{ color: rltk::RGB::from_f32(1.0, 1.0, 0.5), range: 8 })
         .marked::<SimpleMarker<SerializeMe>>()
         .build();
 

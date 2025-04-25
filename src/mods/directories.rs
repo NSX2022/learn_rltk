@@ -103,7 +103,7 @@ pub fn initialize() -> Result<(), std::io::Error> {
         writeln!(file,"//whether or not to use multithreading [DEFAULT = 1] <RANGE = 0-1>")?;
         writeln!(file,"1")?;
         
-        writeln!(file,"//frame limit [DEFAULT = -1] <RANGE = -1-(2^31) -1> CANNOT BE 0")?;
+        writeln!(file,"//frame limit [DEFAULT = -1] <RANGE = -1-((2^31) -1)> CANNOT BE 0")?;
         writeln!(file,"//set to -1 for no limit")?;
         writeln!(file,"-1")?;
         

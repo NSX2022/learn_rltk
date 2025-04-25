@@ -332,9 +332,13 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs : &mut World, key : &str, pos : Spa
             eb = eb.with(LootTable{table: loot.clone()});
         }
 
+        if let Some(light) = &mob_template.light {
+            eb = eb.with(LightSource{ range: light.range, color : rltk::RGB::from_hex(&light.color).expect("Bad color") });
+        }
+
         let new_mob = eb.build();
 
-        // Are they wielding anyting?
+        // Are they wielding anything?
         if let Some(wielding) = &mob_template.equipped {
             for tag in wielding.iter() {
                 spawn_named_entity(raws, ecs, tag, SpawnType::Equipped{ by: new_mob });

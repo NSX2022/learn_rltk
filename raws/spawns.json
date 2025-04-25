@@ -473,7 +473,11 @@
       "quips" : [ "Stand and deliver!", "Alright, hand it over", "Nice loot you have there..." ],
       "attributes" : {},
       "skills" : {},
-      "equipped" : [ "Shortsword", "Shield", "Leather Armor", "Leather Boots" ]
+      "equipped" : [ "Shortsword", "Shield", "Leather Armor", "Leather Boots" ],
+      "light" : {
+        "range" : 6,
+        "color" : "#FFFF55"
+      }
     },
     {
       "name" : "Bat",
@@ -539,6 +543,10 @@
         "attacks" : [
           { "name" : "engulf", "hit_bonus" : 0, "damage" : "1d8" }
         ]
+      },
+      "light" : {
+        "range" : 4,
+        "color" : "#550000"
       }
     },
     {

@@ -347,10 +347,13 @@ pub fn random_builder(new_depth: i32, rng: &mut rltk::RandomNumberGenerator, wid
         builder.with(PrefabBuilder::vaults());
     }
 
-    //put a border of impassible tiles at the map's edge
+    // put a border of impassible tiles at the map's edge
     builder.with(EdgeBorderBuilder::new());
     
     builder.with(CullUnreachable::new());
+    
+    // This is underground, so we want this to be false
+    builder.build_data.map.outdoors = false;
 
     builder
 }

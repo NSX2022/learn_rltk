@@ -50,6 +50,7 @@ pub mod mods;
 pub mod bystander_ai_system;
 mod gamesystem;
 mod animal_ai_system;
+mod lighting_system;
 
 // Making it static so that the config can change it, apply Mutex for thread safety
 // False by default
@@ -120,6 +121,9 @@ impl State {
         hunger.run_now(&self.ecs);
         let mut particles = particle_system::ParticleSpawnSystem{};
         particles.run_now(&self.ecs);
+        // Run lighting last
+        let mut lighting = lighting_system::LightingSystem{};
+        lighting.run_now(&self.ecs);
 
         self.ecs.maintain();
     }
