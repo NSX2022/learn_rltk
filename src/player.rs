@@ -1,6 +1,7 @@
 use rltk::{VirtualKeyCode, Rltk, Point};
 use specs::prelude::*;
 use std::cmp::{max, min};
+use std::mem;
 use crate::map::TileType;
 use crate::map::dungeon;
 use crate::RunState::AwaitingInput;
@@ -12,7 +13,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     let mut viewsheds = ecs.write_storage::<Viewshed>();
     let entities = ecs.entities();
     let combat_stats = ecs.read_storage::<Attributes>();
-    let map = ecs.fetch::<Map>();
+    let mut map = ecs.fetch_mut::<Map>();
     let mut wants_to_melee = ecs.write_storage::<WantsToMelee>();
     let mut entity_moved = ecs.write_storage::<EntityMoved>();
     let mut doors = ecs.write_storage::<Door>();
@@ -29,12 +30,16 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
         if pos.x + delta_x < 0 || pos.x + delta_x > map.width-1 || pos.y + delta_y < 0 || pos.y + delta_y > map.height - 1 { return RunState::AwaitingInput; }
         let destination_idx = map.xy_idx(pos.x + delta_x, pos.y + delta_y);
 
-        for potential_target in map.tile_content[destination_idx].iter() {
-            let bystander = bystanders.get(*potential_target);
-            let vendor = vendors.get(*potential_target);
+        let entities_at_destination: Vec<Entity> = map.tile_content[destination_idx].iter().cloned().collect();
+
+        for potential_target in entities_at_destination {
+            map.populate_blocked();
+            if potential_target == entity { return AwaitingInput }
+            let bystander = bystanders.get(potential_target);
+            let vendor = vendors.get(potential_target);
             if bystander.is_some() || vendor.is_some() {
                 // Note that we want to move the bystander
-                swap_entities.push((*potential_target, pos.x, pos.y));
+                swap_entities.push((potential_target, pos.x, pos.y));
 
                 // Move the player
                 pos.x = min(map.width-1 , max(0, pos.x + delta_x));
@@ -45,14 +50,15 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
                 let mut ppos = ecs.write_resource::<Point>();
                 ppos.x = pos.x;
                 ppos.y = pos.y;
+                result = RunState::PlayerTurn;
             } else {
-                let target = combat_stats.get(*potential_target);
+                let target = combat_stats.get(potential_target);
                 if let Some(_target) = target {
-                    wants_to_melee.insert(entity, WantsToMelee{ target: *potential_target }).expect("Add target failed");
+                    wants_to_melee.insert(entity, WantsToMelee{ target: potential_target }).expect("Add target failed");
                     return RunState::PlayerTurn;
                 }
             }
-            let door = doors.get_mut(*potential_target);
+            let door = doors.get_mut(potential_target);
             /*if let Some(door) = door {
                 //TODO interact with doors and chests etc. with an Interact key like E for more intentional play
                 let glyph = renderables.get_mut(*potential_target).unwrap();
@@ -81,15 +87,16 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
              */
             if let Some(door) = door {
                 door.open = true;
-                blocks_visibility.remove(*potential_target);
-                blocks_movement.remove(*potential_target);
-                let glyph = renderables.get_mut(*potential_target).unwrap();
+                blocks_visibility.remove(potential_target);
+                blocks_movement.remove(potential_target);
+                let glyph = renderables.get_mut(potential_target).unwrap();
                 glyph.glyph = rltk::to_cp437('/');
                 viewshed.dirty = true;
                 result = RunState::PlayerTurn;
             }
         }
 
+        map.populate_blocked();
         if !map.blocked[destination_idx] {
             pos.x = min(map.width-1 , max(0, pos.x + delta_x));
             pos.y = min(map.height-1, max(0, pos.y + delta_y));
@@ -109,11 +116,14 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) -> RunState 
     }
 
     for m in swap_entities.iter() {
+        
         let their_pos = positions.get_mut(m.0);
         if let Some(their_pos) = their_pos {
             their_pos.x = m.1;
             their_pos.y = m.2;
+            result = RunState::PlayerTurn;
         }
+        
     }
 
     result

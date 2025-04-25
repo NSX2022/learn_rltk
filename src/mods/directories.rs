@@ -83,16 +83,14 @@ pub fn initialize() -> Result<(), std::io::Error> {
         let mut file = fs::OpenOptions::new()
             .write(true)
             .open(&config_file_path)?;
-        /*TODO make Main use this via calling read_config and using that function's Tuple return to use as settings 
-            DO THIS AFTER CALLING initialize() to ensure that config.txt exists
-            Skip lines in the config file that start with //
-         */
+
+        // DO THIS AFTER CALLING initialize() to ensure that config.txt exists
         writeln!(file, "//all values with <RANGE = 0-1> are true or false, 1 = true and 0 = false")?;
         writeln!(file, "//whether or not to load lua and json mods [DEFAULT = 0] <RANGE = 0-1>")?;
         writeln!(file, "0")?;
         writeln!(file, "//whether or not to show the map creation visualizer [DEFAULT = 0] <RANGE = 0-1>")?;
         writeln!(file, "0")?;
-        //Ch 57 in the documentation or something
+        // Ch 57 in the documentation or something
         writeln!(file, "//whether or not to show FPS [DEFAULT = 0] <RANGE = 0-1>")?;
         writeln!(file, "0")?;
 
@@ -114,7 +112,7 @@ pub fn initialize() -> Result<(), std::io::Error> {
 
         writeln!(file,"//whether or not to show map boarder [DEFAULT = 0] <RANGE = 0-1>")?;
         writeln!(file,"0")?;
-        //Add more for verbose logging and such
+        //Add more for verbose logging, autosaves, etc.
 
         println!("config.txt created");
     } else {
@@ -167,7 +165,7 @@ pub fn read_config() -> Result<(bool, bool, bool, bool, bool, bool, f32, bool, b
         // Parse the line based on its position in the file
         eprintln!("Extracted {} from config",&read_line);
         match line_number {
-            //NUMBERS NEED TO BE PRECISE WITH WHICH LINE EACH SETTING IS SET ON
+            // NUMBERS NEED TO BE PRECISE WITH WHICH LINE EACH SETTING IS SET ON
             //TODO FIX so that it goes by numbers of values collected, not specific lines, to no longer necessitate hard-coding values
             2 => {
                 load_mods = parse_bool(&read_line)?;
