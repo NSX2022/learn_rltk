@@ -1,9 +1,11 @@
 use specs::prelude::*;
-use super::{Viewshed, Monster, Map, Position, WantsToMelee, RunState,
-            Confusion, particle_system::ParticleBuilder, EntityMoved};
 use rltk::{Point};
+use crate::map::Map;
+use crate::{Confusion, EntityMoved, Monster, MyTurn, Position, RunState, Viewshed, WantsToMelee};
+use crate::particle_system::ParticleBuilder;
 
 pub struct MonsterAI {}
+
 
 impl<'a> System<'a> for MonsterAI {
     #[allow(clippy::type_complexity)]
@@ -18,16 +20,15 @@ impl<'a> System<'a> for MonsterAI {
                         WriteStorage<'a, WantsToMelee>,
                         WriteStorage<'a, Confusion>,
                         WriteExpect<'a, ParticleBuilder>,
-                        WriteStorage<'a, EntityMoved>);
+                        WriteStorage<'a, EntityMoved>,
+                        ReadStorage<'a, MyTurn>);
 
     fn run(&mut self, data : Self::SystemData) {
         let (mut map, player_pos, player_entity, runstate, entities, mut viewshed,
             monster, mut position, mut wants_to_melee, mut confused, mut particle_builder,
-            mut entity_moved) = data;
+            mut entity_moved, turns) = data;
 
-        if *runstate != RunState::MonsterTurn { return; }
-
-        for (entity, mut viewshed,_monster,mut pos) in (&entities, &mut viewshed, &monster, &mut position).join() {
+        for (entity, mut viewshed,_monster,mut pos, _turn) in (&entities, &mut viewshed, &monster, &mut position, &turns).join() {
             let mut can_act = true;
 
             let is_confused = confused.get_mut(entity);

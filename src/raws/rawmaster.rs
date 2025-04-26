@@ -8,6 +8,7 @@ use regex::Regex;
 use specs::hibitset::BitSetLike;
 use specs::saveload::{MarkedBuilder, SimpleMarker};
 use crate::gamesystem::{attr_bonus, mana_at_level, npc_hp};
+use crate::raws::faction_structs::Reaction;
 
 pub fn parse_dice_string(dice : &str) -> (i32, i32, i32) {
     lazy_static! {
@@ -43,7 +44,8 @@ pub struct RawMaster {
     item_index : HashMap<String, usize>,
     mob_index : HashMap<String, usize>,
     prop_index : HashMap<String, usize>,
-    loot_index : HashMap<String, usize>
+    loot_index : HashMap<String, usize>,
+    faction_index : HashMap<String, HashMap<String, Reaction>>
 }
 
 impl RawMaster {
@@ -54,12 +56,14 @@ impl RawMaster {
                 mobs: Vec::new(),
                 props: Vec::new(),
                 spawn_table: Vec::new(),
-                loot_tables: Vec::new()
+                loot_tables: Vec::new(),
+                faction_table : Vec::new(),
             },
             item_index : HashMap::new(),
             mob_index : HashMap::new(),
             prop_index : HashMap::new(),
-            loot_index : HashMap::new()
+            loot_index : HashMap::new(),
+            faction_index : HashMap::new()
         }
     }
 
@@ -335,6 +339,9 @@ pub fn spawn_named_mob(raws: &RawMaster, ecs : &mut World, key : &str, pos : Spa
         if let Some(light) = &mob_template.light {
             eb = eb.with(LightSource{ range: light.range, color : rltk::RGB::from_hex(&light.color).expect("Bad color") });
         }
+
+        // Initiative of 2 to go after player
+        eb = eb.with(Initiative{current: 2});
 
         let new_mob = eb.build();
 

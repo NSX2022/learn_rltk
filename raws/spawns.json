@@ -34,6 +34,15 @@
       ]
     }
   ],
+  "faction_table" : [
+    { "name" : "Player", "responses": { }},
+    { "name" : "Mindless", "responses": { "Default" : "attack" } },
+    { "name" : "Townsfolk", "responses" : { "Default" : "ignore" } },
+    { "name" : "Bandits", "responses" : { "Default" : "attack" } },
+    { "name" : "Cave Goblins", "responses" : { "Default" : "attack" } },
+    { "name" : "Carnivores", "responses" : { "Default" : "attack" } },
+    { "name" : "Herbivores", "responses" : { "Default" : "flee" } }
+  ],
   "items" : [
     {
       "name" : "Health Potion",

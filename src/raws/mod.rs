@@ -10,6 +10,8 @@ mod prop_structs;
 mod rawmaster;
 mod spawn_table_structs;
 mod loot_structs;
+mod faction_structs;
+
 use loot_structs::*;
 
 pub use rawmaster::*;
@@ -17,6 +19,7 @@ use serde::{Deserialize};
 use std::sync::Mutex;
 use lazy_static::lazy_static;
 use item_structs::Item;
+use crate::raws::faction_structs::FactionInfo;
 use crate::raws::spawn_table_structs::SpawnTableEntry;
 
 //TODO initialize this in a function along with modded raws
@@ -32,7 +35,8 @@ pub struct Raws {
     pub mobs : Vec<Mob>,
     pub props : Vec<Prop>,
     pub spawn_table : Vec<SpawnTableEntry>,
-    pub loot_tables : Vec<LootTable>
+    pub loot_tables : Vec<LootTable>,
+    pub faction_table : Vec<FactionInfo>
 }
 
 pub fn load_raws(path:String) {
